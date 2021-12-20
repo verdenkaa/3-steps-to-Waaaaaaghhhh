@@ -99,7 +99,7 @@ class Bolt(pygame.sprite.Sprite):
         
     def update(self):
         print(self.x2, self.y2)
-        self.rect = self.rect.move((self.x2 - self.x) // 150 * self.i, (self.y2 - self.y) // 150 * self.i)
+        self.rect = self.rect.move((self.x2 - self.x) // 10, (self.y2 - self.y) // 10)
         pygame.draw.line(screen, (255, 0, 0), (self.x, self.y), (self.x2, self.y2))
         self.i += 1
 
