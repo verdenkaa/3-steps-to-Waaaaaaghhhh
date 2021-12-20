@@ -1,6 +1,4 @@
 import pygame
-import os
-import sys
 import math
 import random
 
@@ -23,9 +21,8 @@ class Player(pygame.sprite.Sprite):
     
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        #self.image = pygame.image.load("Sprites/Ork-Body.png")
-        #self.image = pygame.transform.scale(self.image, (150, 150))
         self.shooting = False
+        self.go = False
         self.image = load_image("Ork-Body.png", 150, 150)
         self.rect = self.image.get_rect()
         self.position = (500 / 2, 500 / 2)
@@ -42,23 +39,31 @@ class Player(pygame.sprite.Sprite):
         screen.blit(self.image2, self.rect2)
         mouse_pos = pygame.mouse.get_pos()
         rx, ry = self.rect.center
+
         angle = math.degrees(math.atan2(ry - mouse_pos[1],
                                     mouse_pos[0] - rx))
+
         if abs(angle) <= 60 and abs(angle) >= 0:
             self.rot_image = pygame.transform.rotate(self.image, angle)
         rot_image_rect = self.rot_image.get_rect(center = self.rect.center)
         rot_image_rect.y += int(-0.5 * intround(angle, -60, 60))
         rot_image_rect.x += int(-0.5 * intround(angle, -60, 60))
-        #if not pygame.sprite.collide_mask(self, floor):
-            #self.rect = self.rect.move(0, 1)
-            #self.rect2 = self.rect2.move(0, 1)
+
+        if not pygame.sprite.collide_mask(self, floor):
+            self.rect = self.rect.move(0, 6)
+            self.rect2 = self.rect2.move(0, 6)
+
         screen.blit(self.rot_image, rot_image_rect.topleft)
-        print(self.cadr)
+
         if self.shooting and self.cadr > 5:
             Bolt(rx, ry, mouse_pos[0], mouse_pos[1], angle)
             self.cadr = 0
         else:
             self.cadr += 1
+
+        if self.go:
+            self.rect = self.rect.move(self.go, 0)
+            self.rect2 = self.rect2.move(self.go, 0)
 
 class Floor(pygame.sprite.Sprite):
     image = load_image("floor.jpg", 1000, 50)
@@ -67,9 +72,7 @@ class Floor(pygame.sprite.Sprite):
         super().__init__(all_sprites)
         self.image = Floor.image
         self.rect = self.image.get_rect()
-        # вычисляем маску для эффективного сравнения
         self.mask = pygame.mask.from_surface(self.image)
-        # располагаем горы внизу
         self.rect.bottom = height
 
 
@@ -78,19 +81,26 @@ class Bolt(pygame.sprite.Sprite):
 
     def __init__(self, x, y, x2, y2, angle):
         super().__init__(all_sprites)
-        self.x2 = x2 - 150
-        self.y2 = y2 - 170
+        self.x = x
+        self.y = y
+        self.x2 = x2
+        self.y2 = y2
         self.angle = angle
         self.image = Bolt.image
         self.image = pygame.transform.rotate(self.image, angle)
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.center = (x, y)
+        #self.rect = self.rect.move(self.x2 - self.x, self.y2 - self.y)
+        #self.rect.x = x
+        #self.rect.y = y
+        print(x, y)
         self.i = 1
 
         
     def update(self):
-        self.rect = self.rect.move(self.x2 // 100 * self.i, self.y2 // 100 * self.i)
+        print(self.x2, self.y2)
+        self.rect = self.rect.move((self.x2 - self.x) // 150 * self.i, (self.y2 - self.y) // 150 * self.i)
+        pygame.draw.line(screen, (255, 0, 0), (self.x, self.y), (self.x2, self.y2))
         self.i += 1
 
 if __name__ == '__main__':
@@ -102,8 +112,7 @@ if __name__ == '__main__':
     all_sprites = pygame.sprite.Group()
     player = Player()
     floor = Floor()
-    #legs = Legs()
-    #all_sprites.add(floor)
+    all_sprites.add(floor)
 
     running = True
     while running:
@@ -114,10 +123,16 @@ if __name__ == '__main__':
                 player.shooting = True
             elif event.type == pygame.MOUSEBUTTONUP:
                 player.shooting = False
-            #if event.type == pygame.KEYDOWN:
-                #if event.key == pygame.K_SPACE:
-                    #player.jump()
-                    #print(12)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RIGHT:
+                    player.go = 4
+                elif event.key == pygame.K_LEFT:
+                    player.go = -4
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_RIGHT:
+                    player.go = 0
+                elif event.key == pygame.K_LEFT:
+                    player.go = 0
 
         screen.fill((0, 0, 0))
         all_sprites.update()
