@@ -24,11 +24,11 @@ class Nobz(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.shooting = False
         self.go = False
-        self.image = load_image("Ork-Body.png", 150, 150)
+        self.image = load_image("/Nob/Body.png", 150, 150)
         self.rect = self.image.get_rect()
         self.position = (500 / 2, 500 / 2)
         self.rect.center = self.position
-        self.image2 = load_image("Ork-Legs.png", 100, 70)
+        self.image2 = load_image("/Nob/Legs.png", 100, 70)
         self.rect2 = self.image.get_rect()
         self.rect2.center = self.position[0] + 5, self.position[1] + 100
         self.rot_image = self.image
@@ -84,6 +84,8 @@ class Nobz(pygame.sprite.Sprite):
             Bolt(rx, ry, mouse_pos[0], mouse_pos[1], angle)
             self.cadr = 0
             self.ammo -= self.trat
+            if self.dakka and self.ammo < 30:
+                self.ammo += 0.5
         elif self.cadr > 5:
             self.cadr = 5
             if self.ammo < 30 and self.cadr >= 5:
