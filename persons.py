@@ -18,41 +18,62 @@ def intround(x, left, right):
 
 
 
-class Nobz(pygame.sprite.Sprite):
+class Player():
     
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
+    def __init__(self, patron, person, Bx, By, Lx, Ly, ammo, maxammo, plusammo=0.5):
+        #pygame.sprite.Sprite.__init__(self)
         self.shooting = False
         self.go = False
-        self.image = load_image("/Nob/Body.png", 150, 150)
+        self.image = load_image(f"/{person}/Body.png", Bx, By)
         self.rect = self.image.get_rect()
         self.position = (500 / 2, 500 / 2)
         self.rect.center = self.position
-        self.image2 = load_image("/Nob/Legs.png", 100, 70)
+        self.image2 = load_image(f"/{person}/Legs.png", Lx, Ly)
         self.rect2 = self.image.get_rect()
         self.rect2.center = self.position[0] + 5, self.position[1] + 100
         self.rot_image = self.image
         self.mask = pygame.mask.from_surface(self.image)
         self.cadr = 0
         self.fly = False
-        self.ammo = 30
+        self.ammo = ammo
+        self.maxammo = maxammo
         self.trat = 1
         self.dakka = False
-
         self.f = pygame.font.Font(None, 40)
+        self.patron = patron
+        self.soundShoot1 = pg.mixer.Sound('Sounds/boltshoot.mp3')
+        self.plusammo = plusammo
         
     def load_image(name, h, w, colorkey=None):
         image = pygame.image.load(f"Sprites/{name}")
         image = pygame.transform.scale(image, (h, w))
         return image
 
-    def intround(x, left, right):
+    def intround(self, x, left, right):
+        #print(x, left, right)
         if x > right:
-            return right
+            return abs(right)
         elif x < left:
-            return left
+            return abs(left)
         else:
             return x
+
+    def goFunc(self):
+        self.rect = self.rect.move(self.go, 0)
+        self.rect2 = self.rect2.move(self.go, 0)
+
+    def flyFunc(self):
+        self.rect = self.rect.move(0, self.fly)
+        self.rect2 = self.rect2.move(0, self.fly)
+        fly.play()
+
+    def shootFunc(self, rx, ry, mouse_pos0, mouse_pos1, angle):
+        self.patron(rx, ry, mouse_pos0, mouse_pos1, angle, self.soundShoot1)
+        self.cadr = 0
+        self.ammo -= self.trat
+        if self.dakka and self.ammo < 30:
+            self.ammo += self.plusammo
+
 
     def update(self):
         screen.blit(self.image2, self.rect2)
@@ -62,10 +83,11 @@ class Nobz(pygame.sprite.Sprite):
         angle = math.degrees(math.atan2(ry - mouse_pos[1],
                                     mouse_pos[0] - rx))
 
-        if abs(angle) <= 60 and abs(angle) >= 0:
+        if -50 <= angle <= 60:
             self.rot_image = pygame.transform.rotate(self.image, angle)
 
         rot_image_rect = self.rot_image.get_rect(center = self.rect.center)
+        print(intround(angle, -60, 60))
         rot_image_rect.y += int(-0.5 * intround(angle, -60, 60))
         rot_image_rect.x += int(-0.5 * intround(angle, -60, 60))
 
@@ -79,29 +101,102 @@ class Nobz(pygame.sprite.Sprite):
         screen.blit(self.textR, self.text)
 
         screen.blit(self.rot_image, rot_image_rect.topleft)
-        #print(mouse_pos[0], self.rect.center[1])
-        if (self.shooting and self.cadr > 5 and (abs(angle) <= 60 and abs(angle) >= 0) and self.ammo > self.trat) or (self.dakka and self.shooting and self.cadr > 1):
-            Bolt(rx, ry, mouse_pos[0], mouse_pos[1], angle)
-            self.cadr = 0
-            self.ammo -= self.trat
-            if self.dakka and self.ammo < 30:
-                self.ammo += 0.5
+
+        if (self.shooting and self.cadr > 5 and (-50 <= angle <= 60) and self.ammo > self.trat) or (self.dakka and self.shooting and self.cadr > 1 and (-50 <= angle <= 60)):
+            self.shootFunc(rx, ry, mouse_pos[0], mouse_pos[1], angle)
         elif self.cadr > 5:
             self.cadr = 5
-            if self.ammo < 30 and self.cadr >= 5:
-                self.ammo += 0.2
+            if self.ammo < self.maxammo and self.cadr >= 5:
+                self.ammo += self.plusammo
         else:
             self.cadr += 1
 
         if self.go:
-            self.rect = self.rect.move(self.go, 0)
-            self.rect2 = self.rect2.move(self.go, 0)
+            self.goFunc()
 
         if self.fly:
-            self.rect = self.rect.move(0, self.fly)
-            self.rect2 = self.rect2.move(0, self.fly)
-            fly.play()
+            self.flyFunc()
             
+
+class Nobz(Player):
+
+    def __init__(self, patron):
+        super().__init__(patron, "Nob", 150, 150, 100, 70, 30, 30)
+
+
+class Flash(Player):
+
+    def __init__(self, patron):
+        super().__init__(patron, "Flash", 170, 170, 150, 70, 60, 60)
+
+    def shootFunc(self, rx, ry, mouse_pos0, mouse_pos1, angle):
+        self.patron(rx, ry, mouse_pos0, mouse_pos1, angle, self.soundShoot1)
+        self.patron(rx, ry + random.randint(-40, 40), mouse_pos0, mouse_pos1 + random.randint(-40, 40), angle, self.soundShoot1)
+        self.patron(rx, ry + random.randint(-40, 40), mouse_pos0, mouse_pos1 + random.randint(-40, 40), angle, self.soundShoot1)
+        self.patron(rx, ry + random.randint(-40, 40), mouse_pos0, mouse_pos1 + random.randint(-40, 40), angle, self.soundShoot1)
+        self.cadr = 0
+        self.ammo -= self.trat
+        if self.dakka and self.ammo < 60:
+            self.ammo += self.plusammo
+
+    
+
+class Snarad(pygame.sprite.Sprite):
+    
+
+    def __init__(self, x, y, x2, y2, angle, sound, dlin, shir, speed, im="bolt.png"):
+        super().__init__(all_sprites)
+        self.im = im
+        image = load_image(self.im, dlin, shir)
+        self.x = x
+        self.y = y
+        self.x2 = x2
+        self.y2 = y2
+        self.angle = angle
+        self.image = image
+        self.image = pygame.transform.rotate(self.image, angle)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        #self.rect = self.rect.move(self.x2 - self.x, self.y2 - self.y)
+        #self.rect.x = x
+        #self.rect.y = y
+        #print(x, y)
+        self.i = 1
+        self.speed = 10
+        sound.play()
+
+        
+    def update(self):
+        if self.i == 300:
+            return False
+        self.rect = self.rect.move((self.x2 - self.x) // self.speed, (self.y2 - self.y) // self.speed)
+        #pygame.draw.line(screen, (255, 0, 0), (self.x, self.y), (self.x2, self.y2))
+        self.i += 1
+
+
+class Bolt(Snarad):
+
+    def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound):
+        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 30, 10, 20, "bolt.png")
+        self.speed = 10
+        
+class Zap(Snarad):
+
+    def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound, ):
+        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 40, 10, 25, "zap.png")
+        self.speed = 5
+
+class Blast(Snarad):
+
+    def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound, ):
+        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 20, 20, 100, "blast.png")
+        self.speed = 70
+
+class MiniBolt(Snarad):
+
+    def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound):
+        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 20, 7, 20, "bolt.png")
+        self.speed = 11
 
 class Floor(pygame.sprite.Sprite):
     image = load_image("floor.jpg", 1000, 50)
@@ -113,37 +208,6 @@ class Floor(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.rect.bottom = height
 
-
-class Bolt(pygame.sprite.Sprite):
-    image = load_image("bolt.png", 30, 10)
-
-    def __init__(self, x, y, x2, y2, angle):
-        super().__init__(all_sprites)
-        self.x = x
-        self.y = y
-        self.x2 = x2
-        self.y2 = y2
-        self.angle = angle
-        self.image = Bolt.image
-        self.image = pygame.transform.rotate(self.image, angle)
-        self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
-        #self.rect = self.rect.move(self.x2 - self.x, self.y2 - self.y)
-        #self.rect.x = x
-        #self.rect.y = y
-        #print(x, y)
-        self.i = 1
-        bolter.play()
-
-        
-    def update(self):
-        if self.i == 300:
-            return False
-        #print(self.x2, self.y2)
-        self.rect = self.rect.move((self.x2 - self.x) // 20, (self.y2 - self.y) // 20)
-        #pygame.draw.line(screen, (255, 0, 0), (self.x, self.y), (self.x2, self.y2))
-        self.i += 1
-
 if __name__ == '__main__':
     pygame.init()
     clock = pygame.time.Clock()
@@ -151,7 +215,7 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption("WAAAAAAAAGHHHH!!!")
     all_sprites = pygame.sprite.Group()
-    Nobz = Nobz()
+    Nobz = Flash(MiniBolt)
     floor = Floor()
     all_sprites.add(floor)
     bolter = pg.mixer.Sound('Sounds/boltshoot2.wav')
