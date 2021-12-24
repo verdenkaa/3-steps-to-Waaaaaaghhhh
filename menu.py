@@ -14,7 +14,6 @@ def draw_menu(screen):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_TAB:
                     running = False
-                    pygame.quit()
                     os.system('python persons.py')             
 
 

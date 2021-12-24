@@ -132,8 +132,6 @@ class Flash(Player):
     def shootFunc(self, rx, ry, mouse_pos0, mouse_pos1, angle):
         self.patron(rx, ry, mouse_pos0, mouse_pos1, angle, self.soundShoot1)
         self.patron(rx, ry + random.randint(-40, 40), mouse_pos0, mouse_pos1 + random.randint(-40, 40), angle, self.soundShoot1)
-        self.patron(rx, ry + random.randint(-40, 40), mouse_pos0, mouse_pos1 + random.randint(-40, 40), angle, self.soundShoot1)
-        self.patron(rx, ry + random.randint(-40, 40), mouse_pos0, mouse_pos1 + random.randint(-40, 40), angle, self.soundShoot1)
         self.cadr = 0
         self.ammo -= self.trat
         if self.dakka and self.ammo < 60:
