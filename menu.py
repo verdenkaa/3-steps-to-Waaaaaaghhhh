@@ -35,6 +35,12 @@ def menu_game():
                         pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
                         pg.mixer.music.play()
                         pg.mixer.music.set_volume(0.5)
+                if pygame.mouse.get_pos()[0] > 85.5 and pygame.mouse.get_pos()[0] < 329:
+                    if pygame.mouse.get_pos()[1] > 105 and pygame.mouse.get_pos()[1] < 150:
+                        print('Разроботчики добавят эту функцию в следующих версиях)')
+                if pygame.mouse.get_pos()[0] > 149.5 and pygame.mouse.get_pos()[0] < 201:
+                    if pygame.mouse.get_pos()[1] > 305 and pygame.mouse.get_pos()[1] < 350:
+                        print('Разроботчики добавят эту функцию в следующих версиях)')
 
 
 if __name__ == '__main__':
