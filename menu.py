@@ -18,6 +18,12 @@ def load_image(name, h, w, colorkey=None):
     return image
 
 
+def but_cl():
+    pg.mixer.music.load('Sounds/button-pressing.mp3')
+    pg.mixer.music.play()
+    pg.mixer.music.set_volume(2)
+
+
 def menu_game():
     running = True
 
@@ -27,19 +33,21 @@ def menu_game():
                 running = False
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONUP:
-                if pygame.mouse.get_pos()[0] > 63 and pygame.mouse.get_pos()[0] < 374:
+                if pygame.mouse.get_pos()[0] > 63 and pygame.mouse.get_pos()[0] < 417:
                     if pygame.mouse.get_pos()[1] > 205 and pygame.mouse.get_pos()[1] < 250:
                         running = False
-                        pg.mixer.music.pause()
+                        but_cl()
                         os.system('python persons.py')
                         pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
                         pg.mixer.music.play()
                         pg.mixer.music.set_volume(0.5)
-                if pygame.mouse.get_pos()[0] > 85.5 and pygame.mouse.get_pos()[0] < 329:
+                if pygame.mouse.get_pos()[0] > 85.5 and pygame.mouse.get_pos()[0] < 394.5:
                     if pygame.mouse.get_pos()[1] > 105 and pygame.mouse.get_pos()[1] < 150:
+                        #but_cl()
                         print('Разроботчики добавят эту функцию в следующих версиях)')
-                if pygame.mouse.get_pos()[0] > 149.5 and pygame.mouse.get_pos()[0] < 201:
+                if pygame.mouse.get_pos()[0] > 149.5 and pygame.mouse.get_pos()[0] < 340.5:
                     if pygame.mouse.get_pos()[1] > 305 and pygame.mouse.get_pos()[1] < 350:
+                        #but_cl()
                         print('Разроботчики добавят эту функцию в следующих версиях)')
 
 
