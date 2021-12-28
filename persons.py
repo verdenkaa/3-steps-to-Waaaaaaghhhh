@@ -2,6 +2,7 @@ import pygame
 import math
 import random
 import pygame as pg
+import sys
 
 def load_image(name, h, w, colorkey=None):
     image = pygame.image.load(f"Sprites/{name}")
@@ -45,6 +46,9 @@ class Player():
         self.dakka = False
         self.f = pygame.font.Font(None, 40)
         self.patron = patron
+        pg.mixer.music.load('Sounds/Caramell - Caramelldansen.mp3')
+        pg.mixer.music.play()
+        pg.mixer.music.set_volume(0.1)
         self.soundShoot1 = pg.mixer.Sound('Sounds/boltshoot.mp3')
         self.plusammo = 0.5
         self.cadrtoshoot = 5
@@ -286,7 +290,7 @@ if __name__ == '__main__':
     all_sprites = pygame.sprite.Group()
 
 
-    Nobz = Meh(Blast)
+    Nobz = Meh(Bolt)
 
 
     floor = Floor()
@@ -320,8 +324,8 @@ if __name__ == '__main__':
                     Nobz.dakka = True
                     Nobz.trat = 0
                     pygame.time.set_timer(NoDakka, 3000)
-                    
-                    
+                elif event.key == pygame.K_TAB:
+                    sys.exit()
 
             
             if event.type == NoDakka:
