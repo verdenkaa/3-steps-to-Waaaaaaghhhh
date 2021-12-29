@@ -46,9 +46,6 @@ class Player():
         self.dakka = False
         self.f = pygame.font.Font(None, 40)
         self.patron = patron
-        pg.mixer.music.load('Sounds/Caramell - Caramelldansen.mp3')
-        pg.mixer.music.play()
-        pg.mixer.music.set_volume(0.1)
         self.soundShoot1 = pg.mixer.Sound('Sounds/boltshoot.mp3')
         self.plusammo = 0.5
         self.cadrtoshoot = 5
@@ -215,11 +212,14 @@ class Snarad(pygame.sprite.Sprite):
 
         
     def update(self):
+        if pygame.sprite.collide_mask(self, bunker) or pygame.sprite.collide_mask(self, bunker2):
+            self.kill()
         if self.i > 100:
             self.kill()
         self.rect = self.rect.move((self.x2 - self.x) // self.speed, (self.y2 - self.y) // self.speed)
         #pygame.draw.line(screen, (255, 0, 0), (self.x, self.y), (self.x2, self.y2))
         self.i += 1
+
 
 
 class Bolt(Snarad):
@@ -267,6 +267,14 @@ class Bunker(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.rect.bottom = height - 40
         self.rect.x += 30
+        self.Health = 100
+        self.f = pygame.font.Font(None, 60)
+
+    def update(self):
+        self.textR = self.f.render(str(round(self.Health)), False, (255, 0, 0))
+        self.text = self.textR.get_rect()
+        self.text.center = (650, 40)
+        screen.blit(self.textR, self.text)
 
 class Bunker2(pygame.sprite.Sprite):
     image = load_image("bunker.png", 300, 300)
@@ -279,30 +287,81 @@ class Bunker2(pygame.sprite.Sprite):
         self.rect.bottom = height - 340
         self.rect.x += 30
 
+
+class Enemy(pygame.sprite.Sprite):
+
+    def __init__(self, name, x, y):
+        super().__init__(all_sprites)
+        self.image = load_image(name, x, y)
+        self.x = x + 20
+        self.y = y
+        self.rect = self.image.get_rect()
+        self.rect.center = 1200, 700
+        self.move = -3
+        self.damage = 5
+        self.health = 1
+        
+
+    def update(self):
+        self.rect = self.rect.move(self.move, 0)
+        sp = tuple(map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
+        if '<Bolt Sprite(in 1 groups)>' in sp:
+            self.health -= 1
+        elif '<MiniBolt Sprite(in 1 groups)>' in sp:
+            self.health -= 1
+        elif '<Zap Sprite(in 1 groups)>' in sp:
+            self.health -= 10
+        elif '<Blast Sprite(in 1 groups)>' in sp:
+            self.health -= 5
+
+        if self.health < 1:
+            self.move = 0
+            self.image = load_image("Tyranids/Dead/1.png", self.x, self.y)
+
+        if self.rect.x <= 320:
+            bunker.Health -= self.damage
+            self.kill()
+
+
+class Spore(Enemy):
+
+    def __init__(self):
+        super().__init__(f"Tyranids/Spore{random.randint(1, 3)}.png", 30, 70)
+        self.move = -2
+        self.rect.center = 1400, 650
+
+        
+
+
+
 if __name__ == '__main__':
     pygame.init()
+    pg.mixer.music.load('Sounds/Theme.mp3')
+    pg.mixer.music.play()
+    pg.mixer.music.set_volume(0.3)
     image = pygame.image.load("Sprites/fon2.png")
     clock = pygame.time.Clock()
     size = width, height = 1280, 720
     image = pygame.transform.scale(image, size)
-    screen = pygame.display.set_mode(size, pg.FULLSCREEN)
+    screen = pygame.display.set_mode(size)
     pygame.display.set_caption("WAAAAAAAAGHHHH!!!")
     all_sprites = pygame.sprite.Group()
 
 
-    Nobz = Meh(Bolt)
+    Nobz = Nobz(Blast)
 
 
     floor = Floor()
     bunker = Bunker()
     bunker2 = Bunker2()
+    #Spor = Spore()
     all_sprites.add(floor, bunker, bunker2)
     fly = pg.mixer.Sound('Sounds/fly.mp3')
     NoDakka = pygame.USEREVENT + 0
     CanUseDakka = pygame.USEREVENT + 0
     CanDakka = True
     pygame.font.init()
-
+    time = 0
     running = True
     while running:
         #print(clock.get_fps())
@@ -339,6 +398,10 @@ if __name__ == '__main__':
                     Nobz.go = 0
                 elif event.key == pygame.K_SPACE:
                     Nobz.fly = False
+
+        if time % 100 == 0:
+            all_sprites.add(Spore())
+        time += 1
 
         screen.blit(image, (0, 0))
         all_sprites.update()
