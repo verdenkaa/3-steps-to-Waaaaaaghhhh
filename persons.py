@@ -28,9 +28,9 @@ class Player():
         self.position = 100, 500
         self.image = load_image(f"/{person}/Body.png", Bx, By)
         self.rect = self.image.get_rect()
-
+        self.mobs = set(['<Spore Sprite(in 1 groups)>', '<Ground1 Sprite(in 1 groups)>', '<Ground2 Sprite(in 1 groups)>'])
         self.rect.center = self.position[0] + 5, self.position[1] + legsmove
-
+        self.healthImage = load_image("Health.png", 40, 40)
         
         self.rect.center = self.position
         self.image2 = load_image(f"/{person}/Legs.png", Lx, Ly)
@@ -52,6 +52,7 @@ class Player():
         self.todakka = 0
         self.t = True
         self.timer = 200
+        self.health = 10
         
     def load_image(name, h, w, colorkey=None):
         image = pygame.image.load(f"Sprites/{name}")
@@ -86,6 +87,7 @@ class Player():
 
     
     def update(self):
+        global end
         screen.blit(self.image2, self.rect2)
         mouse_pos = pygame.mouse.get_pos()
         rx, ry = self.rect.center
@@ -114,7 +116,7 @@ class Player():
         
         if self.dakka and self.t:
                 dk = pg.mixer.Sound(f'Sounds/Dakka/{random.randint(1, 7)}.mp3')
-                dk.set_volume(0.6)
+                dk.set_volume(0.4)
                 dk.play()
                 self.t = False
         elif not(self.dakka or self.t):
@@ -135,6 +137,28 @@ class Player():
         if self.fly and not(self.dakka):
             self.flyFunc()
 
+        sp = set(map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
+        if self.mobs & sp:
+            self.health -= 1
+
+        if self.health < 1:
+            self.fLose = pygame.font.Font(None, 120)
+            self.textRLose = self.fLose.render("Харошый пастук  был!", False, (255, 0, 0))
+            self.textLose = self.textRLose.get_rect()
+            self.textLose.center = (600, 400)
+            screen.blit(self.textRLose, self.textLose)
+            end = True
+            #pygame.time.delay(20000)
+            #sys.exit()
+        else:
+            x, y = 1240, 40
+            Hrect = self.healthImage.get_rect()
+
+            for _ in range(self.health):
+                Hrect.center = x, y
+                screen.blit(self.healthImage, Hrect)
+                x -= 40
+
 
         
             
@@ -153,6 +177,7 @@ class Flash(Player):
         super().__init__(patron, "Flash", 170, 170, 130, 100, 60, 60, legsmove=70)
         self.plusammo = 0.2
         self.trat = 2
+        self.health = 6
 
     def shootFunc(self, rx, ry, mouse_pos0, mouse_pos1, angle):
         all_sprites.add(self.patron(rx, ry, mouse_pos0, mouse_pos1, angle, self.soundShoot1))
@@ -171,6 +196,7 @@ class Tank(Player):
         self.maxammo = 5
         self.plusammo = 0.05
         self.cadrtoshoot = 30
+        self.health = 2
         self.soundShoot1 = pg.mixer.Sound('Sounds/zap.mp3')
 
 
@@ -182,6 +208,7 @@ class Meh(Player):
         self.maxammo = 12
         self.plusammo = 0.05
         self.cadrtoshoot = 20
+        self.health = 8
         self.soundShoot1 = pg.mixer.Sound('Sounds/blast.mp3')
 
 
@@ -201,20 +228,20 @@ class Snarad(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.image, angle)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
-        #self.rect = self.rect.move(self.x2 - self.x, self.y2 - self.y)
-        #self.rect.x = x
-        #self.rect.y = y
-        #print(x, y)
         self.i = 1
         self.speed = 10
         sound.set_volume(0.2)
         sound.play()
+        self.mobs = set(['<Spore Sprite(in 1 groups)>', '<Ground1 Sprite(in 1 groups)>', '<Floor Sprite(in 1 groups)>', '<Ground2 Sprite(in 1 groups)>'])
 
         
     def update(self):
         if pygame.sprite.collide_mask(self, bunker) or pygame.sprite.collide_mask(self, bunker2):
             self.kill()
-        if self.i > 100:
+        sp = set(map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
+        if self.mobs & sp:
+            self.kill()
+        if self.i > 70:
             self.kill()
         self.rect = self.rect.move((self.x2 - self.x) // self.speed, (self.y2 - self.y) // self.speed)
         #pygame.draw.line(screen, (255, 0, 0), (self.x, self.y), (self.x2, self.y2))
@@ -233,6 +260,7 @@ class Zap(Snarad):
     def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound, ):
         super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 40, 10, 25, "zap.png")
         self.speed = 5
+        self.mobs = set()
 
 class Blast(Snarad):
 
@@ -271,10 +299,18 @@ class Bunker(pygame.sprite.Sprite):
         self.f = pygame.font.Font(None, 60)
 
     def update(self):
+        global end
         self.textR = self.f.render(str(round(self.Health)), False, (255, 0, 0))
         self.text = self.textR.get_rect()
         self.text.center = (650, 40)
         screen.blit(self.textR, self.text)
+        if self.Health < 1:
+            end = True
+            self.fLose = pygame.font.Font(None, 120)
+            self.textRLose = self.fLose.render("Вот аблом!", False, (255, 0, 0))
+            self.textLose = self.textRLose.get_rect()
+            self.textLose.center = (700, 400)
+            screen.blit(self.textRLose, self.textLose)
 
 class Bunker2(pygame.sprite.Sprite):
     image = load_image("bunker.png", 300, 300)
@@ -293,34 +329,49 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, name, x, y):
         super().__init__(all_sprites)
         self.image = load_image(name, x, y)
-        self.x = x + 20
+        self.x = x
         self.y = y
         self.rect = self.image.get_rect()
         self.rect.center = 1200, 700
         self.move = -3
         self.damage = 5
         self.health = 1
+        self.dead = False
+        self.t = False
+        self.sounddead = pg.mixer.Sound('Sounds/Dead.mp3')
+        self.sounddead.set_volume(0.2)
         
 
     def update(self):
-        self.rect = self.rect.move(self.move, 0)
-        sp = tuple(map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
-        if '<Bolt Sprite(in 1 groups)>' in sp:
-            self.health -= 1
-        elif '<MiniBolt Sprite(in 1 groups)>' in sp:
-            self.health -= 1
-        elif '<Zap Sprite(in 1 groups)>' in sp:
-            self.health -= 10
-        elif '<Blast Sprite(in 1 groups)>' in sp:
-            self.health -= 5
+        if self.dead:
+            if self.dead != True:
+                self.image = load_image(f"Tyranids/Dead/{self.dead // 3}.png", self.x, self.y)
+                if self.dead < 21:
+                    self.dead += 1
+                else:
+                    self.kill()
+        else:
+            self.rect = self.rect.move(self.move, 0)
+            sp = tuple(map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
+            if '<Bolt Sprite(in 1 groups)>' in sp:
+                self.health -= 1
+            elif '<MiniBolt Sprite(in 1 groups)>' in sp:
+                self.health -= 1
+            elif '<Zap Sprite(in 1 groups)>' in sp:
+                self.health -= 10
+            elif '<Blast Sprite(in 1 groups)>' in sp:
+                self.health -= 5
 
-        if self.health < 1:
-            self.move = 0
-            self.image = load_image("Tyranids/Dead/1.png", self.x, self.y)
+            if self.health < 1:
+                self.move = 0
+                #self.image = load_image("Tyranids/Dead/1.png", self.x, self.y)
+                if not self.dead:
+                    self.sounddead.play()
+                    self.dead = 3
 
-        if self.rect.x <= 320:
-            bunker.Health -= self.damage
-            self.kill()
+            if self.rect.x <= 320:
+                bunker.Health -= self.damage
+                self.kill()
 
 
 class Spore(Enemy):
@@ -329,6 +380,25 @@ class Spore(Enemy):
         super().__init__(f"Tyranids/Spore{random.randint(1, 3)}.png", 30, 70)
         self.move = -2
         self.rect.center = 1400, 650
+
+
+class Ground1(Enemy):
+
+    def __init__(self):
+        super().__init__(f"Tyranids/Ground1.png", 130, 100)
+        self.move = -3
+        self.rect.center = 1400, 630
+        self.health = 2
+
+
+class Ground2(Enemy):
+
+    def __init__(self):
+        super().__init__(f"Tyranids/Ground2.png", 250, 150)
+        self.move = -1
+        self.rect.center = 1400, 605
+        self.health = 5
+        self.damage = 10
 
         
 
@@ -346,9 +416,13 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption("WAAAAAAAAGHHHH!!!")
     all_sprites = pygame.sprite.Group()
+    bosssound = pg.mixer.Sound('Sounds/BossWalk.mp3')
+    bosssound.set_volume(0.6)
+    gamephaz = 1
+    end = False
 
 
-    Nobz = Nobz(Blast)
+    Nobz = Nobz(Bolt)
 
 
     floor = Floor()
@@ -361,7 +435,7 @@ if __name__ == '__main__':
     CanUseDakka = pygame.USEREVENT + 0
     CanDakka = True
     pygame.font.init()
-    time = 0
+    time = 1
     running = True
     while running:
         #print(clock.get_fps())
@@ -401,12 +475,21 @@ if __name__ == '__main__':
 
         if time % 100 == 0:
             all_sprites.add(Spore())
-        time += 1
+        if time % 150 == 0:
+            all_sprites.add(Ground1())
+        if time % 300 == 0:
+            all_sprites.add(Ground2())
+        if time % 5000 == 0:
+            bosssound.play()
+        time += gamephaz
 
         screen.blit(image, (0, 0))
         all_sprites.update()
         all_sprites.draw(screen)
         Nobz.update()
         pygame.display.flip()
+        if end:
+            pygame.time.delay(1500)
+            sys.exit()
         clock.tick(50)
     pygame.quit()
