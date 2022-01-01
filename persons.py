@@ -28,7 +28,7 @@ class Player():
         self.position = 100, 500
         self.image = load_image(f"/{person}/Body.png", Bx, By)
         self.rect = self.image.get_rect()
-        self.mobs = set(['<Spore Sprite(in 1 groups)>', '<Ground1 Sprite(in 1 groups)>', '<Ground2 Sprite(in 1 groups)>'])
+        self.mobs = set(['<Spore Sprite(in 1 groups)>', '<Ground1 Sprite(in 1 groups)>', '<Ground2 Sprite(in 1 groups)>', '<FlyEnemy Sprite(in 1 groups)>', '<Bio Sprite(in 1 groups)>'])
         self.rect.center = self.position[0] + 5, self.position[1] + legsmove
         self.healthImage = load_image("Health.png", 40, 40)
         
@@ -136,8 +136,10 @@ class Player():
 
         if self.fly and not(self.dakka):
             self.flyFunc()
-
-        sp = set(map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
+        sprites = pygame.sprite.spritecollide(self, all_sprites, False)
+        sp = set(map(str, sprites))
+        #print(sp)
+        
         if self.mobs & sp:
             self.health -= 1
 
@@ -215,7 +217,7 @@ class Meh(Player):
 class Snarad(pygame.sprite.Sprite):
     
 
-    def __init__(self, x, y, x2, y2, angle, sound, dlin, shir, speed, im="bolt.png"):
+    def __init__(self, x, y, x2, y2, angle, sound, dlin, shir, im="bolt.png"):
         super().__init__(all_sprites)
         self.im = im
         image = load_image(self.im, dlin, shir)
@@ -252,27 +254,51 @@ class Snarad(pygame.sprite.Sprite):
 class Bolt(Snarad):
 
     def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound):
-        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 30, 10, 20, "bolt.png")
+        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 30, 10, "bolt.png")
         self.speed = 10
-        
+
+   
 class Zap(Snarad):
 
     def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound, ):
-        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 40, 10, 25, "zap.png")
+        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 40, 10, "zap.png")
         self.speed = 5
         self.mobs = set()
+
 
 class Blast(Snarad):
 
     def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound, ):
-        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 25, 20, 100, "blast.png")
+        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 25, 20, "blast.png")
         self.speed = 30
+
 
 class MiniBolt(Snarad):
 
     def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound):
-        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 20, 7, 20, "bolt.png")
+        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 20, 7, "bolt.png")
         self.speed = 8
+
+
+class Bio(Snarad):
+
+    def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound):
+        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 20, 20, "bio.png")
+        self.speed = 40
+        self.mobs = set(['<Bunker Sprite(in 1 groups)>', '<Bunker2 Sprite(in 1 groups)>'])
+    
+
+    def update(self):
+        if pygame.sprite.collide_mask(self, bunker) or pygame.sprite.collide_mask(self, bunker2):
+            self.kill()
+        sp = set(map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
+        if self.mobs & sp:
+            bunker.Health -= 1
+            self.kill()
+        if self.i > 70:
+            self.kill()
+        self.rect = self.rect.move((self.x2 - self.x) // self.speed, (self.y2 - self.y) // self.speed)
+        self.i += 1
 
 class Floor(pygame.sprite.Sprite):
     image = load_image("floor.png", 1280, 50)
@@ -296,13 +322,13 @@ class Bunker(pygame.sprite.Sprite):
         self.rect.bottom = height - 40
         self.rect.x += 30
         self.Health = 100
-        self.f = pygame.font.Font(None, 60)
+        self.f = pygame.font.Font(None, 40)
 
     def update(self):
         global end
-        self.textR = self.f.render(str(round(self.Health)), False, (255, 0, 0))
+        self.textR = self.f.render(str(round(self.Health)), False, (50, 200, 0))
         self.text = self.textR.get_rect()
-        self.text.center = (650, 40)
+        self.text.center = (100, 40)
         screen.blit(self.textR, self.text)
         if self.Health < 1:
             end = True
@@ -340,9 +366,11 @@ class Enemy(pygame.sprite.Sprite):
         self.t = False
         self.sounddead = pg.mixer.Sound('Sounds/Dead.mp3')
         self.sounddead.set_volume(0.2)
+        self.points = 1
         
 
     def update(self):
+        global score
         if self.dead:
             if self.dead != True:
                 self.image = load_image(f"Tyranids/Dead/{self.dead // 3}.png", self.x, self.y)
@@ -364,6 +392,7 @@ class Enemy(pygame.sprite.Sprite):
 
             if self.health < 1:
                 self.move = 0
+                score += self.points
                 #self.image = load_image("Tyranids/Dead/1.png", self.x, self.y)
                 if not self.dead:
                     self.sounddead.play()
@@ -389,6 +418,7 @@ class Ground1(Enemy):
         self.move = -3
         self.rect.center = 1400, 630
         self.health = 2
+        self.points = 2
 
 
 class Ground2(Enemy):
@@ -399,9 +429,59 @@ class Ground2(Enemy):
         self.rect.center = 1400, 605
         self.health = 5
         self.damage = 10
+        self.points = 3
 
-        
 
+class FlyEnemy(Enemy):
+    def __init__(self):
+        super().__init__(f"Tyranids/Fly.png", 150, 150)
+        self.health = 3
+        self.rect.center = 1300, random.randint(200, 300)
+        self.toammo = 0
+        self.health = 2
+        self.sound = pg.mixer.Sound(f'Sounds/bio.mp3')
+        self.sound.set_volume(0.3)
+        self.ponts = 4
+
+    def update(self):
+        if self.dead:
+            if self.dead != True:
+                self.image = load_image(f"Tyranids/Dead/{self.dead // 3}.png", self.x, self.y)
+                self.rect = self.rect.move(0, 2)
+                if self.dead < 21:
+                    self.dead += 1
+                else:
+                    self.kill()
+        else:
+            self.rect = self.rect.move(self.move, 0)
+            sp = tuple(map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
+            if '<Bolt Sprite(in 1 groups)>' in sp:
+                self.health -= 1
+            elif '<MiniBolt Sprite(in 1 groups)>' in sp:
+                self.health -= 1
+            elif '<Zap Sprite(in 1 groups)>' in sp:
+                self.health -= 10
+            elif '<Blast Sprite(in 1 groups)>' in sp:
+                self.health -= 5
+
+            if self.health < 1:
+                self.move = 0
+                #self.image = load_image("Tyranids/Dead/1.png", self.x, self.y)
+                if not self.dead:
+                    self.sounddead.play()
+                    self.dead = 3
+
+            if self.rect.x < 370:
+                self.move = 0
+
+            if self.toammo >= 80:
+                self.toammo = 0
+                angle = math.degrees(math.atan2(self.rect.x - Gamer.rect.x,
+                                    self.rect.y - Gamer.rect.y))
+                all_sprites.add(Bio(self.rect.x + 50, self.rect.y + 80, Gamer.rect2.x, Gamer.rect2.y, angle, self.sound))
+            else:
+                self.toammo += 1
+                
 
 
 if __name__ == '__main__':
@@ -420,9 +500,14 @@ if __name__ == '__main__':
     bosssound.set_volume(0.6)
     gamephaz = 1
     end = False
+    score = 0
+    f = pygame.font.Font(None, 60)
+    textR = f.render(str(round(score)), False, (200, 200, 200))
+    text = textR.get_rect()
+    text.center = (640, 40)
+    
 
-
-    Nobz = Nobz(Bolt)
+    Gamer = Nobz(Bolt)
 
 
     floor = Floor()
@@ -443,35 +528,35 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                Nobz.shooting = True
+                Gamer.shooting = True
             elif event.type == pygame.MOUSEBUTTONUP:
-                Nobz.shooting = False
+                Gamer.shooting = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_d:
-                    Nobz.go = 6
+                    Gamer.go = 6
                 elif event.key == pygame.K_a:
-                    Nobz.go = -6
+                    Gamer.go = -6
                 elif event.key == pygame.K_SPACE:
-                    Nobz.fly = -15
-                elif event.key == pygame.K_e and not(Nobz.dakka):
-                    Nobz.dakka = True
-                    Nobz.trat = 0
+                    Gamer.fly = -15
+                elif event.key == pygame.K_e and not(Gamer.dakka):
+                    Gamer.dakka = True
+                    Gamer.trat = 0
                     pygame.time.set_timer(NoDakka, 3000)
-                elif event.key == pygame.K_TAB:
+                elif event.key == pygame.K_ESCAPE:
                     sys.exit()
 
             
             if event.type == NoDakka:
-                Nobz.dakka = False
-                Nobz.trat = 1
+                Gamer.dakka = False
+                Gamer.trat = 1
                     
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_d:
-                    Nobz.go = 0
+                    Gamer.go = 0
                 elif event.key == pygame.K_a:
-                    Nobz.go = 0
+                    Gamer.go = 0
                 elif event.key == pygame.K_SPACE:
-                    Nobz.fly = False
+                    Gamer.fly = False
 
         if time % 100 == 0:
             all_sprites.add(Spore())
@@ -479,14 +564,28 @@ if __name__ == '__main__':
             all_sprites.add(Ground1())
         if time % 300 == 0:
             all_sprites.add(Ground2())
-        if time % 5000 == 0:
+        if time % 500 == 0:
+            all_sprites.add(FlyEnemy())
+        if time % 3000 == 0:
+            if gamephaz == 1:
+                gamephaz = 2
+            elif gamephaz == 2:
+                gamephaz = 5
+            else:
+                gamephaz = 10
             bosssound.play()
         time += gamephaz
 
         screen.blit(image, (0, 0))
         all_sprites.update()
         all_sprites.draw(screen)
-        Nobz.update()
+        Gamer.update()
+
+        textR = f.render(str(round(score)), False, (200, 200, 200))
+        text = textR.get_rect()
+        text.center = (640, 40)
+
+        screen.blit(textR, text)
         pygame.display.flip()
         if end:
             pygame.time.delay(1500)
