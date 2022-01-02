@@ -510,11 +510,11 @@ if __name__ == '__main__':
     if ork_pl == 'Nob':
         Gamer = Nobz(Bolt)
     elif ork_pl == 'Flash':
-        Gamer = Flash(Bolt)
+        Gamer = Flash(MiniBolt)
     elif ork_pl == 'Tank':
-        Gamer = Tank(Bolt)
+        Gamer = Tank(Zap)
     elif ork_pl == 'Meh':
-        Gamer = Meh(Bolt)
+        Gamer = Meh(Blast)
 
 
     floor = Floor()
