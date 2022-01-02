@@ -505,9 +505,16 @@ if __name__ == '__main__':
     textR = f.render(str(round(score)), False, (200, 200, 200))
     text = textR.get_rect()
     text.center = (640, 40)
-    
 
-    Gamer = Nobz(Bolt)
+    ork_pl = open('player_ork.txt', 'r').readlines()[0]
+    if ork_pl == 'Nob':
+        Gamer = Nobz(Bolt)
+    elif ork_pl == 'Flash':
+        Gamer = Flash(Bolt)
+    elif ork_pl == 'Tank':
+        Gamer = Tank(Bolt)
+    elif ork_pl == 'Meh':
+        Gamer = Meh(Bolt)
 
 
     floor = Floor()

@@ -76,22 +76,6 @@ def start(num_ork, num_snarad):
     pygame.draw.rect(screen, (255, 0, 0), (0, 300 - 10,
                                            260, text_comp_h + 20), 1)
 
-    font_comp = pygame.font.Font(None, 50)
-    text_comp = font_comp.render("Следующий", True, (255, 0, 0))
-    text_comp_w = text_comp.get_width() #218
-    text_comp_h = text_comp.get_height() #35
-    screen.blit(text_comp, (270, 380))
-    pygame.draw.rect(screen, (0, 0, 0), (270 - 10, 380 - 10,
-                                           text_comp_w + 20, text_comp_h + 20), 2)
-
-    font_comp = pygame.font.Font(None, 50)
-    text_comp = font_comp.render("Прошлый", True, (255, 0, 0))
-    text_comp_w = text_comp.get_width() #168
-    text_comp_h = text_comp.get_height() #35
-    screen.blit(text_comp, (300, 450))
-    pygame.draw.rect(screen, (0, 0, 0), (270 - 10, 450 - 10,
-                                           text_comp_w + 70, text_comp_h + 20), 2)
-
     ork = load_ork(f'{orks[num_ork]}/Body.png')
     f = open('player_ork.txt', 'w')
     f.write(orks[num_ork])
@@ -116,7 +100,7 @@ if __name__ == '__main__':
     pygame.display.set_caption('3-step to Waagh! Choose your Orks!')
 
     orks = ['Nob', 'Flash', 'Tank', 'Meh']
-    snarad = ['bolt', 'zap', 'blast', 'minibolt', 'bio']
+    snarad = ['bolt']
 
     pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
     pg.mixer.music.play()
@@ -156,22 +140,6 @@ if __name__ == '__main__':
                             num_ork -= 1
                             if num_ork < 0:
                                 num_ork = 3
-                            start(num_ork, num_snarad)
-                            pygame.display.update()
-                    if pygame.mouse.get_pos()[0] > 260 and pygame.mouse.get_pos()[0] < 498:
-                        if pygame.mouse.get_pos()[1] > 370 and pygame.mouse.get_pos()[1] < 425:
-                            but_cl()
-                            num_snarad += 1
-                            if num_snarad > len(snarad) - 1:
-                                num_snarad = 0
-                            start(num_ork, num_snarad)
-                            pygame.display.update()
-                    if pygame.mouse.get_pos()[0] > 260 and pygame.mouse.get_pos()[0] < 498:
-                        if pygame.mouse.get_pos()[1] > 440 and pygame.mouse.get_pos()[1] < 495:
-                            but_cl()
-                            num_snarad -= 1
-                            if num_snarad < 0:
-                                num_snarad = 3
                             start(num_ork, num_snarad)
                             pygame.display.update()
 
