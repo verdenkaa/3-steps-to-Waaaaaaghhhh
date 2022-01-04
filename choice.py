@@ -3,7 +3,7 @@ import os
 import pygame as pg
 import sys
 
-class choice_sprite(pygame.sprite.Sprite):
+class Сhoice_sprite(pygame.sprite.Sprite):
     def __init__(self, name, image_s_x, image_s_y, center_x, center_y):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((center_x, center_y))
@@ -40,7 +40,7 @@ def start(num_ork, num_snarad):
     global orks
     global snarad
     all_sprites = pygame.sprite.Group()
-    menu = choice_sprite('fon.jpg', 500, 500, 250, 250)
+    menu = Сhoice_sprite('fon.jpg', 500, 500, 250, 250)
     all_sprites.add(menu)
     all_sprites.draw(screen)
 
@@ -80,8 +80,8 @@ def start(num_ork, num_snarad):
     f = open('player_ork.txt', 'w')
     f.write(orks[num_ork])
     f.close()
-    ork = pygame.transform.scale(ork, (60, 100))
-    screen.blit(ork, (70, 130))
+    ork = pygame.transform.scale(ork, (130, 200))
+    screen.blit(ork, (70, 80))
     pygame.display.update()
 
     snar = load_ork(snarad[num_snarad] + '.png')
@@ -125,6 +125,10 @@ if __name__ == '__main__':
                 if event.type == pygame.QUIT:
                     running = False
                     sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
+                        sys.exit()
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if pygame.mouse.get_pos()[0] > 260 and pygame.mouse.get_pos()[0] < 498:
                         if pygame.mouse.get_pos()[1] > 80 and pygame.mouse.get_pos()[1] < 135:
