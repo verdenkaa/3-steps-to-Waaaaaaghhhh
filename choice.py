@@ -20,7 +20,6 @@ def load_image2(name, h, w, colorkey=None):
 def load_ork(name, colorkey=None):
     fullname = 'Sprites/' + name
 
-    print(fullname)
     image = pygame.image.load(fullname)
     if colorkey is not None:
         image = image.convert()
@@ -76,7 +75,7 @@ def start(num_ork):
     pygame.draw.rect(screen, (255, 0, 0), (0, 300 - 10,
                                            488, text_comp_h + 20), 1)
 
-    text = open('orks_info.txt', 'r')
+    text = open('orks_info.txt', 'r', encoding='utf-8')
     ork_info = text.readlines()[num_ork].split('\n')[0]
     text.close()
     font_comp = pygame.font.Font(None, 20)
