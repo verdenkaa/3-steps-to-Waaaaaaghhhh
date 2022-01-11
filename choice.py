@@ -68,13 +68,36 @@ def start(num_ork, num_snarad):
     pygame.draw.rect(screen, (0, 0, 0), (270 - 10, 180 - 10,
                                            text_comp_w + 70, text_comp_h + 20), 2)
 
-    font_comp = pygame.font.Font(None, 50)
-    text_comp = font_comp.render("Ваш снаряд:", True, (255, 0, 0))
-    text_comp_w = text_comp.get_width() #242
+    font_comp = pygame.font.Font(None, 39)
+    text_comp = font_comp.render("Немного информации о вашем орке:", True, (255, 0, 0))
+    text_comp_w = text_comp.get_width() #478
     text_comp_h = text_comp.get_height() #35
     screen.blit(text_comp, (0, 300))
     pygame.draw.rect(screen, (255, 0, 0), (0, 300 - 10,
-                                           260, text_comp_h + 20), 1)
+                                           488, text_comp_h + 20), 1)
+
+    text = open('orks_info.txt', 'r')
+    ork_info = text.readlines()[num_ork].split('\n')[0]
+    text.close()
+    font_comp = pygame.font.Font(None, 20)
+    text_comp = font_comp.render(ork_info, True, (255, 0, 0))
+    text_comp_w = text_comp.get_width() #?
+    text_comp_h = text_comp.get_height() #14
+    print(text_comp_w, text_comp_h)
+    kol_str = text_comp_w // 500
+    print(text_comp_w // 500)
+    for i in range(kol_str):
+        font_comp = pygame.font.Font(None, 17)
+        text_comp = font_comp.render(ork_info[(len(ork_info) // kol_str) * i:(len(ork_info) // kol_str) * (i + 1)], True, (255, 0, 0))
+        text_comp_w = text_comp.get_width()
+        text_comp_h = text_comp.get_height()
+        screen.blit(text_comp, (0, 370 + (i * 15)))
+    if text_comp_w % 500 != 0:
+        font_comp = pygame.font.Font(None, 17)
+        text_comp = font_comp.render(ork_info[(len(ork_info) // kol_str) * kol_str:], True, (255, 0, 0))
+        text_comp_w = text_comp.get_width()
+        text_comp_h = text_comp.get_height()
+        screen.blit(text_comp, (0, 370 + (kol_str * 15)))
 
     ork = load_ork(f'{orks[num_ork]}/Body.png')
     f = open('player_ork.txt', 'w')
@@ -82,14 +105,6 @@ def start(num_ork, num_snarad):
     f.close()
     ork = pygame.transform.scale(ork, (130, 200))
     screen.blit(ork, (70, 80))
-    pygame.display.update()
-
-    snar = load_ork(snarad[num_snarad] + '.png')
-    f = open('player_snar.txt', 'w')
-    f.write(snarad[num_snarad])
-    f.close()
-    snar = pygame.transform.scale(snar, (50, 30))
-    screen.blit(snar, (70, 400))
     pygame.display.update()
 
 
