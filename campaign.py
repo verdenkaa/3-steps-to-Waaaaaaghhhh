@@ -100,18 +100,26 @@ def menu_game():
                 if not dialog:
                     if pygame.mouse.get_pos()[0] > coord[0] and pygame.mouse.get_pos()[0] < (coord[0] + 40):
                         if pygame.mouse.get_pos()[1] > coord[1] and pygame.mouse.get_pos()[1] < (coord[1] + 40):
-                            #здесь переход на игру
+                            game = open('game_regim.txt', 'w')
+                            game.write('Campaign')
+                            game.close()
+                            pg.mixer.music.pause()
+                            os.system('python persons.py')
+                            pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
+                            pg.mixer.music.play()
+                            pg.mixer.music.set_volume(0.5)
                             missia = open('mission_number.txt', 'r')
-                            num_company = int(missia.readlines()[0]) + 1 #заменить после добавления игры и проверки на прохождение на num_company = int(missia.readlines()[0])
+                            num_company = int(missia.readlines()[0])
                             missia.close()
-                            missia = open('mission_number.txt', 'w') #удалить после добавления игры и проверки на прохождение
-                            missia.write(str(num_company))#удалить после добавления игры и проверки на прохождение
-                            missia.close()#удалить после добавления игры и проверки на прохождение
                             running = False
-                            if num_company != 4:
+                            if num_company != 3:
                                 menu_game()
                             else:
-                                #здесь вставка на самолёт
+                                pg.mixer.music.pause()
+                                os.system('python fly.py')
+                                missia = open('mission_number.txt', 'w')
+                                missia.write('0')
+                                missia.close()
                                 sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:

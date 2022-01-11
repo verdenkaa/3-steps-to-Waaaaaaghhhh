@@ -466,6 +466,11 @@ if __name__ == '__main__':
     pg.mixer.music.load('Sounds/Theme.mp3')
     pg.mixer.music.play()
     pg.mixer.music.set_volume(0.3)
+
+    game = open('game_regim.txt', 'r')
+    game_reg = game.readlines()[0]
+    game.close()
+
     image = pygame.image.load("Sprites/fon2.png")
     clock = pygame.time.Clock()
     size = width, height = 1280, 720
@@ -477,7 +482,7 @@ if __name__ == '__main__':
     bosssound.set_volume(0.6)
     gamephaz = 1  # отвечает за фазы игры (скорость спавна монстров вытекает)
     end = False  # проигрыш
-    score = 0  # очки                                  ЛЕЕЕЕЕЕННЯЯЯЯЯЯЯЯ ЭТО ОЧКИ КОТОРЫЕ ТЕБЕ НУЖНЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    score = 0
     f = pygame.font.Font(None, 60)
     textR = f.render(str(round(score)), False, (200, 200, 200))
     text = textR.get_rect()
@@ -526,6 +531,15 @@ if __name__ == '__main__':
                     pygame.time.set_timer(NoDakka, 3000)
                 elif event.key == pygame.K_ESCAPE:
                     sys.exit()
+                elif event.key == pygame.K_F1:
+                    if game_reg == 'Campaign':
+                        if num_company == 0:
+                            score = 500
+                        elif num_company == 1:
+                            score = 1000
+                        elif num_company == 2:
+                            score = 1500
+
 
             
             if event.type == NoDakka:
@@ -539,6 +553,32 @@ if __name__ == '__main__':
                     Gamer.go = 0
                 elif event.key == pygame.K_SPACE:
                     Gamer.fly = False
+
+        if game_reg == 'Campaign':
+            missia = open('mission_number.txt', 'r')
+            num_company = int(missia.readlines()[0])
+            missia.close()
+            if num_company == 0:
+                if score == 500:
+                    missia = open('mission_number.txt', 'w')
+                    pygame.time.delay(1500)
+                    missia.write(str(num_company + 1))
+                    missia.close()
+                    sys.exit()
+            elif num_company == 1:
+                if score == 1000:
+                    missia = open('mission_number.txt', 'w')
+                    pygame.time.delay(1500)
+                    missia.write(str(num_company + 1))
+                    missia.close()
+                    sys.exit()
+            elif num_company == 2:
+                if score == 1500:
+                    missia = open('mission_number.txt', 'w')
+                    pygame.time.delay(1500)
+                    missia.write(str(num_company + 1))
+                    missia.close()
+                    sys.exit()
 
         if time % 100 == 0:  # спавн врагов по счетчику time
             all_sprites.add(Spore())

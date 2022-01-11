@@ -37,6 +37,9 @@ def menu_game():
                     if pygame.mouse.get_pos()[1] > 205 and pygame.mouse.get_pos()[1] < 250:
                         running = False
                         pg.mixer.music.pause()
+                        game = open('game_regim.txt', 'w')
+                        game.write('Infinity')
+                        game.close()
                         os.system('python persons.py')
                         pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
                         pg.mixer.music.play()
@@ -57,6 +60,10 @@ def menu_game():
                         pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
                         pg.mixer.music.play()
                         pg.mixer.music.set_volume(0.5)
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+                    sys.exit()
 
 
 if __name__ == '__main__':
