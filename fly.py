@@ -6,17 +6,14 @@ import pygame
 from numba import njit
 
 
-
-
-
 @njit(fastmath=True)
 def ray_casting(screen_array, player_pos, player_angle, player_height, player_pitch,
                      screen_width, screen_height, delta_angle, ray_distance, h_fov, scale_height):
 
-    screen_array[:] = np.array([80, 136, 191])
+    screen_array[:] = np.array([211, 180, 155])  # цвет фона
     y_buffer = np.full(screen_width, screen_height)
 
-    ray_angle = player_angle - h_fov
+    ray_angle = player_angle - h_fov  # угол выстрела луча
     for num_ray in range(screen_width):
         first_contact = False
         sin_a = math.sin(ray_angle)
@@ -28,25 +25,30 @@ def ray_casting(screen_array, player_pos, player_angle, player_height, player_pi
                 y = int(player_pos[1] + depth * sin_a)
                 if 0 < y < map_height:
 
-                    # remove fish eye and get height on screen
+                    # Удаление эффекта рыбьего глаза
                     depth *= math.cos(player_angle - ray_angle)
                     height_on_screen = int((player_height - height_map[x, y][0]) /
                                            depth * scale_height + player_pitch)
 
-                    # remove unnecessary drawing
+                    # обрезка краев
                     if not first_contact:
                         y_buffer[num_ray] = min(height_on_screen, screen_height)
                         first_contact = True
 
-                    # remove mirror bug
+                    # удаление бага с отзеркаливанием
                     if height_on_screen < 0:
                         height_on_screen = 0
 
-                    # draw vert line
+                    # отрисовка линий
                     if height_on_screen < y_buffer[num_ray]:
                         for screen_y in range(height_on_screen, y_buffer[num_ray]):
                             screen_array[num_ray, screen_y] = color_map[x, y]
                         y_buffer[num_ray] = height_on_screen
+
+
+
+                    
+                
 
         ray_angle += delta_angle
     return screen_array
@@ -54,7 +56,6 @@ def ray_casting(screen_array, player_pos, player_angle, player_height, player_pi
 
 class VoxelRender:
     def __init__(self, screen, width, height, player):
-        #self.app = app
         self.screen = screen
         self.player = player
         self.width = width
@@ -65,7 +66,8 @@ class VoxelRender:
         self.delta_angle = self.fov / self.num_rays
         self.ray_distance = 4000
         self.scale_height = 900
-        self.screen_array = np.full((width, height, 3), (0, 0, 0))
+        self.screen_array = np.full((width, height, 3), (0, 0, 10))
+        print(self.screen_array[0])
 
     def update(self):
         self.screen_array = ray_casting(self.screen_array, self.player.pos, self.player.angle,
@@ -74,8 +76,8 @@ class VoxelRender:
                                         self.h_fov, self.scale_height)
 
     def draw(self):
-        kompas = pygame.font.SysFont(None, 48)
-        kompasname = kompas.render("N", True, (0, 0, 0))
+        #kompas = pygame.font.SysFont(None, 48)
+        #kompasname = kompas.render("N", True, (0, 0, 0))
         #self.screen.blit(kompasname, (800, 30))
         pg.surfarray.blit_array(self.screen, self.screen_array)
 
@@ -92,7 +94,7 @@ class Player:
         pygame.mouse.set_visible(False)
 
     def update(self):
-        print(self.pos, self.pitch, self.angle)
+        #(self.pos, self.pitch, self.angle)
         sin_a = math.sin(self.angle)
         cos_a = math.cos(self.angle)
 
@@ -123,32 +125,6 @@ class Player:
             self.angle -= self.angle_vel
         if pressed_key[pg.K_d]:
             self.angle += self.angle_vel
-
-
-class App:
-    def __init__(self):
-        self.res = self.width, self.height = (800, 450)
-        self.screen = pg.display.set_mode(self.res, pg.SCALED)
-        self.clock = pg.time.Clock()
-        self.player = Player()
-        self.voxel_render = VoxelRender(self)
-
-    def update(self):
-        self.player.update()
-        self.voxel_render.update()
-
-    def draw(self):
-        self.voxel_render.draw()
-        pg.display.flip()
-
-    def run(self):
-        while True:
-            self.update()
-            self.draw()
-
-            [exit() for i in pg.event.get() if i.type == pg.QUIT]
-            self.clock.tick(60)
-            pg.display.set_caption(f'FPS: {self.clock.get_fps()}')
 
 
 if __name__ == '__main__':
