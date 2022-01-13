@@ -1,26 +1,19 @@
 import pygame as pg
 import numpy as np
+import numpy
 import math
+import pygame
 from numba import njit
-import math
 
 
 
-height_map_img = pg.image.load('img/height_map.jpg')
-height_map = pg.surfarray.array3d(height_map_img)
-
-color_map_img = pg.image.load('img/color_map.jpg')
-color_map = pg.surfarray.array3d(color_map_img)
-
-map_height = len(height_map[0])
-map_width = len(height_map)
 
 
 @njit(fastmath=True)
 def ray_casting(screen_array, player_pos, player_angle, player_height, player_pitch,
                      screen_width, screen_height, delta_angle, ray_distance, h_fov, scale_height):
 
-    screen_array[:] = np.array([0, 0, 0])
+    screen_array[:] = np.array([80, 136, 191])
     y_buffer = np.full(screen_width, screen_height)
 
     ray_angle = player_angle - h_fov
@@ -60,25 +53,31 @@ def ray_casting(screen_array, player_pos, player_angle, player_height, player_pi
 
 
 class VoxelRender:
-    def __init__(self, app):
-        self.app = app
-        self.player = app.player
-        self.fov = math.pi / 6
-        self.h_fov = self.fov / 2
-        self.num_rays = app.width
+    def __init__(self, screen, width, height, player):
+        #self.app = app
+        self.screen = screen
+        self.player = player
+        self.width = width
+        self.height = height
+        self.fov = math.pi / 5
+        self.h_fov = self.fov / 3
+        self.num_rays = width
         self.delta_angle = self.fov / self.num_rays
-        self.ray_distance = 2000
-        self.scale_height = 920
-        self.screen_array = np.full((app.width, app.height, 3), (0, 0, 0))
+        self.ray_distance = 4000
+        self.scale_height = 900
+        self.screen_array = np.full((width, height, 3), (0, 0, 0))
 
     def update(self):
         self.screen_array = ray_casting(self.screen_array, self.player.pos, self.player.angle,
-                                        self.player.height, self.player.pitch, self.app.width,
-                                        self.app.height, self.delta_angle, self.ray_distance,
+                                        self.player.height, self.player.pitch, self.width,
+                                        self.height, self.delta_angle, self.ray_distance,
                                         self.h_fov, self.scale_height)
 
     def draw(self):
-        pg.surfarray.blit_array(self.app.screen, self.screen_array)
+        kompas = pygame.font.SysFont(None, 48)
+        kompasname = kompas.render("N", True, (0, 0, 0))
+        #self.screen.blit(kompasname, (800, 30))
+        pg.surfarray.blit_array(self.screen, self.screen_array)
 
 
 class Player:
@@ -86,42 +85,44 @@ class Player:
         self.pos = np.array([0, 0], dtype=float)
         self.angle = math.pi / 4
         self.height = 270
-        self.pitch = 40
+        self.pitch = 30
         self.angle_vel = 0.01
-        self.vel = 3
+        self.vel = 1
+        self.speedK = 2
+        pygame.mouse.set_visible(False)
 
     def update(self):
+        print(self.pos, self.pitch, self.angle)
         sin_a = math.sin(self.angle)
         cos_a = math.cos(self.angle)
 
+        self.pos[0] += self.vel * cos_a * self.speedK
+        self.pos[1] += self.vel * sin_a * self.speedK
+        self.height += self.vel * self.pitch / 200
+
         pressed_key = pg.key.get_pressed()
         if pressed_key[pg.K_UP]:
-            self.pitch += self.vel
+            self.speedK += 1
+            if self.speedK > 10:
+                self.speedK = 10
         if pressed_key[pg.K_DOWN]:
-            self.pitch -= self.vel
-
-        if pressed_key[pg.K_LEFT]:
-            self.angle -= self.angle_vel
-        if pressed_key[pg.K_RIGHT]:
-            self.angle += self.angle_vel
+            self.speedK -= 1
+            if self.speedK < 1:
+                self.speedK = 1
 
         if pressed_key[pg.K_q]:
-            self.height += self.vel
+            self.angle -= self.angle_vel
         if pressed_key[pg.K_e]:
-            self.height -= self.vel
-
+            self.angle += self.angle_vel
+        
         if pressed_key[pg.K_w]:
-            self.pos[0] += self.vel * cos_a
-            self.pos[1] += self.vel * sin_a
+            self.pitch -= self.vel
         if pressed_key[pg.K_s]:
-            self.pos[0] -= self.vel * cos_a
-            self.pos[1] -= self.vel * sin_a
+            self.pitch += self.vel
         if pressed_key[pg.K_a]:
-            self.pos[0] += self.vel * sin_a
-            self.pos[1] -= self.vel * cos_a
+            self.angle -= self.angle_vel
         if pressed_key[pg.K_d]:
-            self.pos[0] -= self.vel * sin_a
-            self.pos[1] += self.vel * cos_a
+            self.angle += self.angle_vel
 
 
 class App:
@@ -151,5 +152,24 @@ class App:
 
 
 if __name__ == '__main__':
-    app = App()
-    app.run()
+    pygame.font.init()
+    height_map = np.load(open("map/height", "rb"))
+    color_map = np.load(open("map/map", "rb"))
+    map_height = len(height_map[0])
+    map_width = len(height_map)
+    res = width, height = (800, 450)
+    screen = pg.display.set_mode(res, pg.SCALED, pg.FULLSCREEN)
+    clock = pg.time.Clock()
+    player = Player()
+    voxel_render = VoxelRender(screen, width, height, player)
+
+    while True:
+            player.update()
+            voxel_render.update()
+            
+            voxel_render.draw()
+            pg.display.flip()
+
+            [exit() for i in pg.event.get() if i.type == pg.QUIT]
+            clock.tick(60)
+            pg.display.set_caption(f'FPS: {clock.get_fps()}')
