@@ -12,6 +12,10 @@ class Menu_sprite(pygame.sprite.Sprite):
         self.rect.center = (250, 250)
 
 
+def draw_cursor(screen, posit):
+    screen.blit(cursor_image, posit)
+
+
 def load_image(name, h, w, colorkey=None):
     image = pygame.image.load(f"Sprites/{name}")
     image = pygame.transform.scale(image, (h, w))
@@ -64,14 +68,12 @@ def menu_game():
                 if event.key == pygame.K_ESCAPE:
                     running = False
                     sys.exit()
+            draw_cursor(screen, pygame.mouse.get_pos())
+            pygame.display.flip()
+            draw_menu()
 
 
-if __name__ == '__main__':
-    pygame.init()
-    size = 500, 500
-    screen = pygame.display.set_mode(size)
-    pygame.display.set_caption('3-step to Waagh!')
-
+def draw_menu():
     all_sprites = pygame.sprite.Group()
     menu = Menu_sprite()
     all_sprites.add(menu)
@@ -100,6 +102,18 @@ if __name__ == '__main__':
     screen.blit(text_pref, (159.5, 315))
     pygame.draw.rect(screen, (255, 0, 0), (159.5 - 10, 315 - 10,
                                            text_pref_w + 20, text_pref_h + 20), 1)
+
+
+if __name__ == '__main__':
+    pygame.init()
+    size = 500, 500
+    screen = pygame.display.set_mode(size)
+    pygame.display.set_caption('3-step to Waagh!')
+
+    cursor_image = load_image('cursor.png', 50, 50)
+    pygame.mouse.set_visible(False)
+
+    draw_menu()
 
     pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
     pg.mixer.music.play(-1)
