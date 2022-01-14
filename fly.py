@@ -104,8 +104,10 @@ class Player:
         self.height += self.vel * self.pitch / 200
 
         if self.height <= height_map[int(self.pos[0])][int(self.pos[1])][0]:
+            boom.play()
             pygame.time.delay(1500)
             sys.exit()
+
         pressed_key = pg.key.get_pressed()
         if pressed_key[pg.K_UP]:
             self.speedK += 1
@@ -133,6 +135,7 @@ class Player:
 
 if __name__ == '__main__':
     pygame.font.init()
+    pygame.init()
     height_map = np.load(open("map/height", "rb"))
     color_map = np.load(open("map/map", "rb"))
     map_height = len(height_map[0])
@@ -144,7 +147,12 @@ if __name__ == '__main__':
     voxel_render = VoxelRender(screen, width, height, player)
     kabin = pygame.image.load(f"Sprites/kabina.png")
     kabin = pygame.transform.scale(kabin, (800, 450))
-    kabrect = kabin.get_rect()
+    pg.mixer.music.load('Sounds/samolet.mp3')
+    pg.mixer.music.play(-1)
+    pg.mixer.music.set_volume(1)
+    boom = pg.mixer.Sound('Sounds/boombaby.mp3')
+    #samoletsound.set_volume(0.3)
+    #samoletsound.play(-1)
 
     while True:
             player.update()
