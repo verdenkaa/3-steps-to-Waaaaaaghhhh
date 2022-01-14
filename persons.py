@@ -559,21 +559,21 @@ if __name__ == '__main__':
             num_company = int(missia.readlines()[0])
             missia.close()
             if num_company == 0:
-                if score == 500:
+                if score >= 500:
                     missia = open('mission_number.txt', 'w')
                     pygame.time.delay(1500)
                     missia.write(str(num_company + 1))
                     missia.close()
                     sys.exit()
             elif num_company == 1:
-                if score == 1000:
+                if score >= 1000:
                     missia = open('mission_number.txt', 'w')
                     pygame.time.delay(1500)
                     missia.write(str(num_company + 1))
                     missia.close()
                     sys.exit()
             elif num_company == 2:
-                if score == 1500:
+                if score >= 1500:
                     missia = open('mission_number.txt', 'w')
                     pygame.time.delay(1500)
                     missia.write(str(num_company + 1))
