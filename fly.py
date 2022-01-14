@@ -1,8 +1,8 @@
 import pygame as pg
 import numpy as np
-import numpy
 import math
 import pygame
+import sys
 from numba import njit
 
 
@@ -84,9 +84,9 @@ class VoxelRender:
 
 class Player:
     def __init__(self):
-        self.pos = np.array([0, 0], dtype=float)
-        self.angle = math.pi / 4
-        self.height = 270
+        self.pos = np.array([1700, 800], dtype=float)
+        self.angle = 273.5
+        self.height = 40
         self.pitch = 30
         self.angle_vel = 0.01
         self.vel = 1
@@ -94,6 +94,7 @@ class Player:
         pygame.mouse.set_visible(False)
 
     def update(self):
+        #print(self.height, self.pos[0])
         #(self.pos, self.pitch, self.angle)
         sin_a = math.sin(self.angle)
         cos_a = math.cos(self.angle)
@@ -102,6 +103,9 @@ class Player:
         self.pos[1] += self.vel * sin_a * self.speedK
         self.height += self.vel * self.pitch / 200
 
+        if self.height <= height_map[int(self.pos[0])][int(self.pos[1])][0]:
+            pygame.time.delay(1500)
+            sys.exit()
         pressed_key = pg.key.get_pressed()
         if pressed_key[pg.K_UP]:
             self.speedK += 1
@@ -138,14 +142,16 @@ if __name__ == '__main__':
     clock = pg.time.Clock()
     player = Player()
     voxel_render = VoxelRender(screen, width, height, player)
+    kabin = pygame.image.load(f"Sprites/kabina.png")
+    kabin = pygame.transform.scale(kabin, (800, 450))
+    kabrect = kabin.get_rect()
 
     while True:
             player.update()
             voxel_render.update()
-            
             voxel_render.draw()
+            screen.blit(kabin, (0, 0))
             pg.display.flip()
-
             [exit() for i in pg.event.get() if i.type == pg.QUIT]
             clock.tick(60)
             pg.display.set_caption(f'FPS: {clock.get_fps()}')
