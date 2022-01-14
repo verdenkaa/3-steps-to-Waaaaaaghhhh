@@ -114,7 +114,7 @@ if __name__ == '__main__':
     orks = ['Nob', 'Flash', 'Tank', 'Meh']
 
     pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
-    pg.mixer.music.play()
+    pg.mixer.music.play(-1)
     pg.mixer.music.set_volume(0.25)
 
     ork_type = open('player_ork.txt', 'r')

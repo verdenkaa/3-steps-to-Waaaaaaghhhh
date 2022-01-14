@@ -42,7 +42,7 @@ def menu_game():
                         game.close()
                         os.system('python persons.py')
                         pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
-                        pg.mixer.music.play()
+                        pg.mixer.music.play(-1)
                         pg.mixer.music.set_volume(0.5)
                 if pygame.mouse.get_pos()[0] > 85.5 and pygame.mouse.get_pos()[0] < 394.5:
                     if pygame.mouse.get_pos()[1] > 105 and pygame.mouse.get_pos()[1] < 150:
@@ -50,7 +50,7 @@ def menu_game():
                         pg.mixer.music.pause()
                         os.system('python campaign.py')
                         pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
-                        pg.mixer.music.play()
+                        pg.mixer.music.play(-1)
                         pg.mixer.music.set_volume(0.5)
                 if pygame.mouse.get_pos()[0] > 149.5 and pygame.mouse.get_pos()[0] < 340.5:
                     if pygame.mouse.get_pos()[1] > 305 and pygame.mouse.get_pos()[1] < 350:
@@ -58,7 +58,7 @@ def menu_game():
                         pg.mixer.music.pause()
                         os.system('python choice.py')
                         pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
-                        pg.mixer.music.play()
+                        pg.mixer.music.play(-1)
                         pg.mixer.music.set_volume(0.5)
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -102,7 +102,7 @@ if __name__ == '__main__':
                                            text_pref_w + 20, text_pref_h + 20), 1)
 
     pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
-    pg.mixer.music.play()
+    pg.mixer.music.play(-1)
     pg.mixer.music.set_volume(0.5)
 
     fps = 120

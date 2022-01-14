@@ -106,7 +106,7 @@ def menu_game():
                             pg.mixer.music.pause()
                             os.system('python persons.py')
                             pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
-                            pg.mixer.music.play()
+                            pg.mixer.music.play(-1)
                             pg.mixer.music.set_volume(0.5)
                             missia = open('mission_number.txt', 'r')
                             num_company = int(missia.readlines()[0])
@@ -144,7 +144,7 @@ if __name__ == '__main__':
     dr_pole()
 
     pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
-    pg.mixer.music.play()
+    pg.mixer.music.play(-1)
     pg.mixer.music.set_volume(0.5)
 
     fps = 120

@@ -464,7 +464,7 @@ class FlyEnemy(Enemy):  # класс летющего монстра
 if __name__ == '__main__':
     pygame.init()
     pg.mixer.music.load('Sounds/Theme.mp3')
-    pg.mixer.music.play()
+    pg.mixer.music.play(-1)
     pg.mixer.music.set_volume(0.3)
 
     game = open('game_regim.txt', 'r')
