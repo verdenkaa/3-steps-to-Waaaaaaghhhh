@@ -61,24 +61,24 @@ def monolog():
     ork = pygame.transform.scale(ork, (130, 200))
     screen.blit(ork, (0, 390))
 
-    fraze = open('suget.txt', 'r')
-    ork_dialog = fraze.readlines()[this_mission()]
+    fraze = open('suget.txt', 'r', encoding='utf-8')
+    ork_dialog = fraze.readlines()[this_mission()][:-1]
     fraze.close()
     font_comp = pygame.font.Font(None, 50)
     text_comp = font_comp.render(ork_dialog, True, (255, 0, 0))
     text_comp_w = text_comp.get_width()
-    kol_str = text_comp_w // 500
+    kol_str = text_comp_w // 700
     for j in range(kol_str):
         font_comp = pygame.font.Font(None, 50)
         text_comp = font_comp.render(ork_dialog[(len(ork_dialog) // kol_str) * j:(len(ork_dialog) // kol_str) * (j + 1)], True, (255, 0, 0))
         text_comp_w = text_comp.get_width()
         screen.blit(text_comp, (150, 400 + (j * 34)))
-    if text_comp_w % 500 != 0:
+    if text_comp_w % 700 != 0:
         font_comp = pygame.font.Font(None, 50)
         text_comp = font_comp.render(ork_dialog[(len(ork_dialog) // kol_str) * kol_str:], True, (255, 0, 0))
         text_comp_w = text_comp.get_width()
         screen.blit(text_comp, (150, 400 + (kol_str * 34)))
-    pygame.draw.rect(screen, (255, 0, 0), (140, 390, 650, 400 + (kol_str * 34)), 1)
+    pygame.draw.rect(screen, (255, 0, 0), (140, 390, 800, 68 + (kol_str * 34)), 1)
     pygame.display.update()
 
 
