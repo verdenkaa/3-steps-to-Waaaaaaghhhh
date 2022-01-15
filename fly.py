@@ -164,6 +164,7 @@ if __name__ == '__main__':
     text.center = (270, 30)
     f = pygame.font.Font(None, 60)
     FinT = f.render("Это конец, зог", False, (200, 10, 10))
+    pg.display.set_caption('Мы лэтым!')
     
 
     while True:
@@ -179,5 +180,4 @@ if __name__ == '__main__':
             pg.display.flip()
             [exit() for i in pg.event.get() if i.type == pg.QUIT]
             clock.tick(60)
-            pg.display.set_caption(f'FPS: {clock.get_fps()}')
             finish += 1
