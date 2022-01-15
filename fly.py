@@ -6,7 +6,13 @@ import sys
 from numba import njit
 
 
-@njit(fastmath=True)
+def load_image(name, h, w, colorkey=None):  # функция загрузки спрайтов
+    image = pygame.image.load(f"Sprites/{name}")
+    image = pygame.transform.scale(image, (h, w))
+    return image
+
+
+@njit(fastmath=True)  # 
 def ray_casting(screen_array, player_pos, player_angle, player_height, player_pitch,
                      screen_width, screen_height, delta_angle, ray_distance, h_fov, scale_height):
 
@@ -54,7 +60,7 @@ def ray_casting(screen_array, player_pos, player_angle, player_height, player_pi
     return screen_array
 
 
-class VoxelRender:
+class VoxelRender:  # класс рендера экрана
     def __init__(self, screen, width, height, player):
         self.screen = screen
         self.player = player
@@ -76,57 +82,50 @@ class VoxelRender:
                                         self.h_fov, self.scale_height)
 
     def draw(self):
-        #kompas = pygame.font.SysFont(None, 48)
-        #kompasname = kompas.render("N", True, (0, 0, 0))
-        #self.screen.blit(kompasname, (800, 30))
         pg.surfarray.blit_array(self.screen, self.screen_array)
 
 
-class Player:
+class Player:  # класс игрока
     def __init__(self):
         self.pos = np.array([1700, 800], dtype=float)
         self.angle = 273.5
         self.height = 40
         self.pitch = 30
-        self.angle_vel = 0.01
+        self.angle_vel = 0.005
         self.vel = 1
         self.speedK = 2
+        self.fly_angele = 1
         pygame.mouse.set_visible(False)
 
     def update(self):
-        #print(self.height, self.pos[0])
-        #(self.pos, self.pitch, self.angle)
         sin_a = math.sin(self.angle)
         cos_a = math.cos(self.angle)
 
-        self.pos[0] += self.vel * cos_a * self.speedK
+        self.pos[0] += self.vel * cos_a * self.speedK  # перемещаем самолет в зависимости от скорости
         self.pos[1] += self.vel * sin_a * self.speedK
         self.height += self.vel * self.pitch / 200
 
-        if self.height <= height_map[int(self.pos[0])][int(self.pos[1])][0]:
-            boom.play()
-            pygame.time.delay(1500)
-            sys.exit()
+        try:
+            if self.height <= height_map[int(self.pos[0])][int(self.pos[1])][0]:  # если самолет врезается
+                boom.play()
+                screen.blit(FinT, (180, 160))
+                pg.display.flip()
+                pygame.time.delay(2500)
+                sys.exit()
+        except IndexError:  # если самолет врезалсяуз за картой
+            if self.height <= 0:
+                boom.play()
+                screen.blit(FinT, (180, 160))
+                pg.display.flip()
+                pygame.time.delay(2500)
+                sys.exit()
 
-        pressed_key = pg.key.get_pressed()
-        if pressed_key[pg.K_UP]:
-            self.speedK += 1
-            if self.speedK > 10:
-                self.speedK = 10
-        if pressed_key[pg.K_DOWN]:
-            self.speedK -= 1
-            if self.speedK < 1:
-                self.speedK = 1
-
-        if pressed_key[pg.K_q]:
-            self.angle -= self.angle_vel
-        if pressed_key[pg.K_e]:
-            self.angle += self.angle_vel
+        pressed_key = pg.key.get_pressed()  # ниже управление
         
         if pressed_key[pg.K_w]:
-            self.pitch -= self.vel
+            self.pitch -= self.fly_angele
         if pressed_key[pg.K_s]:
-            self.pitch += self.vel
+            self.pitch += self.fly_angele
         if pressed_key[pg.K_a]:
             self.angle -= self.angle_vel
         if pressed_key[pg.K_d]:
@@ -136,30 +135,49 @@ class Player:
 if __name__ == '__main__':
     pygame.font.init()
     pygame.init()
-    height_map = np.load(open("map/height", "rb"))
-    color_map = np.load(open("map/map", "rb"))
+    height_map_img = pg.image.load('map/hight_map.png')
+    color_map_img = pg.image.load('map/color_map.png')
+    height_map = pg.surfarray.array3d(height_map_img)
+    color_map = pg.surfarray.array3d(color_map_img)
     map_height = len(height_map[0])
     map_width = len(height_map)
-    res = width, height = (800, 450)
-    screen = pg.display.set_mode(res, pg.SCALED, pg.FULLSCREEN)
+    res = width, height = (800, 400)
+    screen = pg.display.set_mode(res, pg.SCALED, vsync=1, depth=1)  # увиличиваем размер окна в 2 раза от scaled
     clock = pg.time.Clock()
     player = Player()
     voxel_render = VoxelRender(screen, width, height, player)
     kabin = pygame.image.load(f"Sprites/kabina.png")
-    kabin = pygame.transform.scale(kabin, (800, 450))
+    kabin = pygame.transform.scale(kabin, (width, height))
     pg.mixer.music.load('Sounds/samolet.mp3')
     pg.mixer.music.play(-1)
     pg.mixer.music.set_volume(1)
     boom = pg.mixer.Sound('Sounds/boombaby.mp3')
-    #samoletsound.set_volume(0.3)
-    #samoletsound.play(-1)
+    finish = 0
+    orks = ['Nob', 'Flash', 'Tank', 'Meh']
+    ork_type = open('player_ork.txt', 'r')
+    num_ork = orks.index(ork_type.readlines()[0])
+    ork_type.close()
+    ork = load_image(f'{orks[num_ork]}/Body.png', 65, 100)
+    f = pygame.font.Font(None, 30)
+    textR = f.render("Босс йа понять как счетать до три!", False, (200, 100, 100))
+    text = textR.get_rect()
+    text.center = (270, 30)
+    f = pygame.font.Font(None, 60)
+    FinT = f.render("Это конец, зог", False, (200, 10, 10))
+    
 
     while True:
             player.update()
             voxel_render.update()
             voxel_render.draw()
             screen.blit(kabin, (0, 0))
+            if finish > 600:  # через промежуток времени нступает конец игры
+                screen.blit(ork, (65, 20))
+                screen.blit(textR, text)
+                player.pitch -= 1
+                player.fly_angele = 0
             pg.display.flip()
             [exit() for i in pg.event.get() if i.type == pg.QUIT]
             clock.tick(60)
             pg.display.set_caption(f'FPS: {clock.get_fps()}')
+            finish += 1

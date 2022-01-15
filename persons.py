@@ -4,10 +4,12 @@ import random
 import pygame as pg
 import sys
 
+
 def load_image(name, h, w, colorkey=None):  # функция загрузки спрайтов
     image = pygame.image.load(f"Sprites/{name}")
     image = pygame.transform.scale(image, (h, w))
     return image
+
 
 def intround(x, left, right): # функция округления числа до заданных диапазонов
     if x > right:
@@ -18,9 +20,8 @@ def intround(x, left, right): # функция округления числа �
         return x
 
 
-
 class Player(): # Оснвной класс игрока, от которго наследуются персонажи
-    
+
     def __init__(self, patron, person, Bx, By, Lx, Ly, ammo, maxammo, legsmove=100):
         self.shooting = False
         self.go = False
@@ -218,7 +219,7 @@ class Snarad(pygame.sprite.Sprite):  # основной класс снаряд�
 
         
     def update(self):
-        if pygame.sprite.collide_mask(self, bunker) or pygame.sprite.collide_mask(self, bunker2):
+        if pygame.sprite.collide_mask(self, bunker) or pygame.sprite.collide_mask(self, bunker2) or pygame.sprite.collide_mask(self, trub):
             self.kill()  # уничтожение пр и столкновении
         sp = set(map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
         if self.mobs & sp:
@@ -317,7 +318,8 @@ class Bunker(pygame.sprite.Sprite):  # класс нижней части бун
             self.textLose.center = (700, 400)
             screen.blit(self.textRLose, self.textLose)
 
-class Bunker2(pygame.sprite.Sprite):  # ворой этаж, здоровье общее с первым
+
+class Bunker2(pygame.sprite.Sprite):  # второй этаж, здоровье общее с первым
     image = load_image("bunker.png", 300, 300)
 
     def __init__(self):
@@ -327,6 +329,18 @@ class Bunker2(pygame.sprite.Sprite):  # ворой этаж, здоровье о
         self.mask = pygame.mask.from_surface(self.image)
         self.rect.bottom = height - 340
         self.rect.x += 30
+
+
+class Truba(pygame.sprite.Sprite):  # Трубка мешающая трелять с неподходящего этажа
+    image = load_image("truba.png", 900, 200)
+
+    def __init__(self):
+        super().__init__(all_sprites)
+        self.image = Truba.image
+        self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect.y = 320
+        self.rect.x = 450
 
 
 class Enemy(pygame.sprite.Sprite):  # родительский класс наземных противников
@@ -475,7 +489,7 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     size = width, height = 1280, 720
     image = pygame.transform.scale(image, size)
-    screen = pygame.display.set_mode(size)
+    screen = pygame.display.set_mode(size, pg.SCALED)
     pygame.display.set_caption("WAAAAAAAAGHHHH!!!")
     all_sprites = pygame.sprite.Group()
     bosssound = pg.mixer.Sound('Sounds/BossWalk.mp3')
@@ -487,7 +501,7 @@ if __name__ == '__main__':
     textR = f.render(str(round(score)), False, (200, 200, 200))
     text = textR.get_rect()
     text.center = (640, 40)
-
+    pygame.time.delay(1500)
     ork_pl = open('player_ork.txt', 'r').readlines()[0]  # определение персонажа
     if ork_pl == 'Nob':
         Gamer = Nobz(Bolt)
@@ -502,8 +516,8 @@ if __name__ == '__main__':
     floor = Floor()
     bunker = Bunker()
     bunker2 = Bunker2()
-    #Spor = Spore()
-    all_sprites.add(floor, bunker, bunker2)
+    trub = Truba()
+    all_sprites.add(floor, bunker, bunker2, trub)
     fly = pg.mixer.Sound('Sounds/fly.mp3')
     NoDakka = pygame.USEREVENT + 0
     CanDakka = True
@@ -511,7 +525,7 @@ if __name__ == '__main__':
     time = 1
     running = True
     while running:
-        for event in pygame.event.get():  # условия упавления персонажем
+        for event in pygame.event.get():  # условия управления персонажем
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
