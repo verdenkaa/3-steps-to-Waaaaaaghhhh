@@ -68,9 +68,10 @@ def menu_game():
                 if event.key == pygame.K_ESCAPE:
                     running = False
                     sys.exit()
-            draw_cursor(screen, pygame.mouse.get_pos())
-            pygame.display.flip()
-            draw_menu()
+            elif event.type == pygame.MOUSEMOTION:
+                draw_cursor(screen, pygame.mouse.get_pos())
+                pygame.display.flip()
+                draw_menu()
 
 
 def draw_menu():
@@ -110,7 +111,7 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('3-step to Waagh!')
 
-    cursor_image = load_image('cursor.png', 50, 50)
+    cursor_image = load_image('cursor.png', 25, 25)
     pygame.mouse.set_visible(False)
 
     draw_menu()
@@ -119,7 +120,7 @@ if __name__ == '__main__':
     pg.mixer.music.play(-1)
     pg.mixer.music.set_volume(0.5)
 
-    fps = 120
+    fps = 240
     clock = pygame.time.Clock()
     clock.tick(fps)
 

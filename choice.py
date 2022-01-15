@@ -12,10 +12,15 @@ class Сhoice_sprite(pygame.sprite.Sprite):
         self.rect.center = (center_x, center_y)
 
 
+def draw_cursor(screen, posit):
+    screen.blit(cursor_image, posit)
+
+
 def load_image2(name, h, w, colorkey=None):
     image = pygame.image.load(f"Sprites/{name}")
     image = pygame.transform.scale(image, (h, w))
     return image
+
 
 def load_ork(name, colorkey=None):
     fullname = 'Sprites/' + name
@@ -111,6 +116,9 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('3-step to Waagh! Choose your Orks!')
 
+    cursor_image = load_image2('cursor.png', 25, 25)
+    pygame.mouse.set_visible(False)
+
     orks = ['Nob', 'Flash', 'Tank', 'Meh']
 
     pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
@@ -160,5 +168,8 @@ if __name__ == '__main__':
                                 num_ork = 3
                             start(num_ork)
                             pygame.display.update()
+            start(num_ork)
+            draw_cursor(screen, pygame.mouse.get_pos())
+            pygame.display.flip()
 
     pygame.quit()

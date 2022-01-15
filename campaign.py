@@ -13,6 +13,10 @@ class Menu_sprite(pygame.sprite.Sprite):
         self.rect.center = (640, 360)
 
 
+def draw_cursor(screen, posit):
+    screen.blit(cursor_image, posit)
+
+
 def load_image(name, h, w, colorkey=None):
     image = pygame.image.load(f"Sprites/{name}")
     image = pygame.transform.scale(image, (h, w))
@@ -21,7 +25,6 @@ def load_image(name, h, w, colorkey=None):
 def load_ork(name, colorkey=None):
     fullname = 'Sprites/' + name
 
-    print(fullname)
     image = pygame.image.load(fullname)
     if colorkey is not None:
         image = image.convert()
@@ -94,12 +97,14 @@ def menu_game():
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONUP:
                 but_cl()
-                if dialog:
-                    dr_pole()
-                    dialog = False
+                if event.button == 1:
+                    if dialog:
+                        dr_pole()
+                        dialog = False
                 if not dialog:
                     if pygame.mouse.get_pos()[0] > coord[0] and pygame.mouse.get_pos()[0] < (coord[0] + 40):
                         if pygame.mouse.get_pos()[1] > coord[1] and pygame.mouse.get_pos()[1] < (coord[1] + 40):
+                            dr_pole()
                             game = open('Text/game_regim.txt', 'w')
                             game.write('Campaign')
                             game.close()
@@ -125,6 +130,11 @@ def menu_game():
                 if event.key == pygame.K_ESCAPE:
                     running = False
                     sys.exit()
+            elif event.type == pygame.MOUSEMOTION:
+                if dialog == False:
+                    dr_pole()
+                    draw_cursor(screen, pygame.mouse.get_pos())
+                    pygame.display.flip()
 
 
 if __name__ == '__main__':
@@ -132,6 +142,9 @@ if __name__ == '__main__':
     size = 1280, 720
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('3-step to Waagh!')
+
+    cursor_image = load_image('cursor.png', 25, 25)
+    pygame.mouse.set_visible(False)
 
     orks = ['Nob', 'Flash', 'Tank', 'Meh']
 
