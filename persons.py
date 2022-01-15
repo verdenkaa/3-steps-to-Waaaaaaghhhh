@@ -481,7 +481,7 @@ if __name__ == '__main__':
     pg.mixer.music.play(-1)
     pg.mixer.music.set_volume(0.3)
 
-    game = open('game_regim.txt', 'r')
+    game = open('Text/game_regim.txt', 'r')
     game_reg = game.readlines()[0]
     game.close()
 
@@ -502,7 +502,7 @@ if __name__ == '__main__':
     text = textR.get_rect()
     text.center = (640, 40)
     pygame.time.delay(1500)
-    ork_pl = open('player_ork.txt', 'r').readlines()[0]  # определение персонажа
+    ork_pl = open('Text/player_ork.txt', 'r').readlines()[0]  # определение персонажа
     if ork_pl == 'Nob':
         Gamer = Nobz(Bolt)
     elif ork_pl == 'Flash':
@@ -569,26 +569,26 @@ if __name__ == '__main__':
                     Gamer.fly = False
 
         if game_reg == 'Campaign':
-            missia = open('mission_number.txt', 'r')
+            missia = open('Text/mission_number.txt', 'r')
             num_company = int(missia.readlines()[0])
             missia.close()
             if num_company == 0:
                 if score >= 500:
-                    missia = open('mission_number.txt', 'w')
+                    missia = open('Text/mission_number.txt', 'w')
                     pygame.time.delay(1500)
                     missia.write(str(num_company + 1))
                     missia.close()
                     sys.exit()
             elif num_company == 1:
                 if score >= 1000:
-                    missia = open('mission_number.txt', 'w')
+                    missia = open('Text/mission_number.txt', 'w')
                     pygame.time.delay(1500)
                     missia.write(str(num_company + 1))
                     missia.close()
                     sys.exit()
             elif num_company == 2:
                 if score >= 1500:
-                    missia = open('mission_number.txt', 'w')
+                    missia = open('Text/mission_number.txt', 'w')
                     pygame.time.delay(1500)
                     missia.write(str(num_company + 1))
                     missia.close()

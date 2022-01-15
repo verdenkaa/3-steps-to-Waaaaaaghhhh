@@ -38,7 +38,7 @@ def but_cl():
 
 
 def this_mission():
-    missia = open('mission_number.txt', 'r')
+    missia = open('Text/mission_number.txt', 'r')
     num_company = int(missia.readlines()[0])
     missia.close()
     return num_company
@@ -61,7 +61,7 @@ def monolog():
     ork = pygame.transform.scale(ork, (130, 200))
     screen.blit(ork, (0, 390))
 
-    fraze = open('suget.txt', 'r', encoding='utf-8')
+    fraze = open('Text/suget.txt', 'r', encoding='utf-8')
     ork_dialog = fraze.readlines()[this_mission()][:-1]
     fraze.close()
     font_comp = pygame.font.Font(None, 50)
@@ -100,7 +100,7 @@ def menu_game():
                 if not dialog:
                     if pygame.mouse.get_pos()[0] > coord[0] and pygame.mouse.get_pos()[0] < (coord[0] + 40):
                         if pygame.mouse.get_pos()[1] > coord[1] and pygame.mouse.get_pos()[1] < (coord[1] + 40):
-                            game = open('game_regim.txt', 'w')
+                            game = open('Text/game_regim.txt', 'w')
                             game.write('Campaign')
                             game.close()
                             pg.mixer.music.pause()
@@ -108,7 +108,7 @@ def menu_game():
                             pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
                             pg.mixer.music.play(-1)
                             pg.mixer.music.set_volume(0.5)
-                            missia = open('mission_number.txt', 'r')
+                            missia = open('Text/mission_number.txt', 'r')
                             num_company = int(missia.readlines()[0])
                             missia.close()
                             running = False
@@ -117,7 +117,7 @@ def menu_game():
                             else:
                                 pg.mixer.music.pause()
                                 os.system('python fly.py')
-                                missia = open('mission_number.txt', 'w')
+                                missia = open('Text/mission_number.txt', 'w')
                                 missia.write('0')
                                 missia.close()
                                 sys.exit()
@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
     orks = ['Nob', 'Flash', 'Tank', 'Meh']
 
-    ork_type = open('player_ork.txt', 'r')
+    ork_type = open('Text/player_ork.txt', 'r')
     num_ork = orks.index(ork_type.readlines()[0])
     ork_type.close()
 

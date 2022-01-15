@@ -154,7 +154,7 @@ if __name__ == '__main__':
     boom = pg.mixer.Sound('Sounds/boombaby.mp3')
     finish = 0
     orks = ['Nob', 'Flash', 'Tank', 'Meh']
-    ork_type = open('player_ork.txt', 'r')
+    ork_type = open('Text/player_ork.txt', 'r')
     num_ork = orks.index(ork_type.readlines()[0])
     ork_type.close()
     ork = load_image(f'{orks[num_ork]}/Body.png', 65, 100)

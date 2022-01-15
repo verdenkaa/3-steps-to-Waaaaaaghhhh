@@ -41,7 +41,7 @@ def menu_game():
                     if pygame.mouse.get_pos()[1] > 205 and pygame.mouse.get_pos()[1] < 250:
                         running = False
                         pg.mixer.music.pause()
-                        game = open('game_regim.txt', 'w')
+                        game = open('Text/game_regim.txt', 'w')
                         game.write('Infinity')
                         game.close()
                         os.system('python persons.py')

@@ -75,7 +75,7 @@ def start(num_ork):
     pygame.draw.rect(screen, (255, 0, 0), (0, 300 - 10,
                                            488, text_comp_h + 20), 1)
 
-    text = open('orks_info.txt', 'r', encoding='utf-8')
+    text = open('Text/orks_info.txt', 'r', encoding='utf-8')
     ork_info = text.readlines()[num_ork].split('\n')[0]
     text.close()
     font_comp = pygame.font.Font(None, 20)
@@ -97,7 +97,7 @@ def start(num_ork):
         screen.blit(text_comp, (0, 370 + (kol_str * 15)))
 
     ork = load_ork(f'{orks[num_ork]}/Body.png')
-    play_ork = open('player_ork.txt', 'w')
+    play_ork = open('Text/player_ork.txt', 'w')
     play_ork.write(orks[num_ork])
     play_ork.close()
     ork = pygame.transform.scale(ork, (130, 200))
@@ -117,7 +117,7 @@ if __name__ == '__main__':
     pg.mixer.music.play(-1)
     pg.mixer.music.set_volume(0.25)
 
-    ork_type = open('player_ork.txt', 'r')
+    ork_type = open('Text/player_ork.txt', 'r')
     start(orks.index(ork_type.readlines()[0]))
     ork_type.close()
 
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     pygame.display.flip()
 
     while pygame.event.wait().type != pygame.QUIT:
-        ork_type = open('player_ork.txt', 'r')
+        ork_type = open('Text/player_ork.txt', 'r')
         num_ork = orks.index(ork_type.readlines()[0])
         ork_type.close()
 
