@@ -13,10 +13,6 @@ class Menu_sprite(pygame.sprite.Sprite):
         self.rect.center = (640, 360)
 
 
-def draw_cursor(screen, posit):
-    screen.blit(cursor_image, posit)
-
-
 def load_image(name, h, w, colorkey=None):
     image = pygame.image.load(f"Sprites/{name}")
     image = pygame.transform.scale(image, (h, w))
@@ -59,7 +55,7 @@ def dr_pole():
     pygame.display.update()
 
 
-def monolog():
+def monolog(missia_n):
     ork = load_ork(f'{orks[num_ork]}/Body.png')
     ork = pygame.transform.scale(ork, (130, 200))
     screen.blit(ork, (0, 390))
@@ -81,13 +77,20 @@ def monolog():
         text_comp = font_comp.render(ork_dialog[(len(ork_dialog) // kol_str) * kol_str:], True, (255, 0, 0))
         text_comp_w = text_comp.get_width()
         screen.blit(text_comp, (150, 400 + (kol_str * 34)))
-    pygame.draw.rect(screen, (255, 0, 0), (140, 390, 800, 68 + (kol_str * 34)), 1)
+    if missia_n == 3:
+        print(1)
+        pygame.draw.rect(screen, (255, 0, 0), (140, 390, 920, 68 + (kol_str * 34)), 1)
+    else:
+        pygame.draw.rect(screen, (255, 0, 0), (140, 390, 820, 68 + (kol_str * 34)), 1)
     pygame.display.update()
 
 
-def menu_game():
+def draw_game():
     running = True
-    monolog()
+    missia = open('Text/mission_number.txt', 'r')
+    num_company = int(missia.readlines()[0])
+    missia.close()
+    monolog(num_company)
     dialog = True
 
     while running:
@@ -100,11 +103,11 @@ def menu_game():
                 if event.button == 1:
                     if dialog:
                         dr_pole()
+                        print(1)
                         dialog = False
                 if not dialog:
                     if pygame.mouse.get_pos()[0] > coord[0] and pygame.mouse.get_pos()[0] < (coord[0] + 40):
                         if pygame.mouse.get_pos()[1] > coord[1] and pygame.mouse.get_pos()[1] < (coord[1] + 40):
-                            dr_pole()
                             game = open('Text/game_regim.txt', 'w')
                             game.write('Campaign')
                             game.close()
@@ -117,24 +120,20 @@ def menu_game():
                             num_company = int(missia.readlines()[0])
                             missia.close()
                             running = False
-                            if num_company != 3:
-                                menu_game()
-                            else:
+                            print(num_company)
+                            monolog(num_company)
+                            dialog = True
+                            if num_company == 3:
                                 pg.mixer.music.pause()
-                                os.system('python fly.py')
                                 missia = open('Text/mission_number.txt', 'w')
                                 missia.write('0')
                                 missia.close()
+                                os.system('python fly.py')
                                 sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
                     sys.exit()
-            elif event.type == pygame.MOUSEMOTION:
-                if dialog == False:
-                    dr_pole()
-                    draw_cursor(screen, pygame.mouse.get_pos())
-                    pygame.display.flip()
 
 
 if __name__ == '__main__':
@@ -142,9 +141,6 @@ if __name__ == '__main__':
     size = 1280, 720
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('3-step to Waagh!')
-
-    cursor_image = load_image('cursor.png', 25, 25)
-    pygame.mouse.set_visible(False)
 
     orks = ['Nob', 'Flash', 'Tank', 'Meh']
 
@@ -167,5 +163,5 @@ if __name__ == '__main__':
     pygame.display.flip()
 
     while pygame.event.wait().type != pygame.QUIT:
-        menu_game()
+        draw_game()
     pygame.quit()

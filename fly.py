@@ -141,7 +141,7 @@ if __name__ == '__main__':
     color_map = pg.surfarray.array3d(color_map_img)
     map_height = len(height_map[0])
     map_width = len(height_map)
-    res = width, height = (800, 400)
+    res = width, height = (1280, 720)
     screen = pg.display.set_mode(res, pg.SCALED, vsync=1, depth=1)  # увиличиваем размер окна в 2 раза от scaled
     clock = pg.time.Clock()
     player = Player()
@@ -172,7 +172,7 @@ if __name__ == '__main__':
             voxel_render.update()
             voxel_render.draw()
             screen.blit(kabin, (0, 0))
-            if finish > 600:  # через промежуток времени нступает конец игры
+            if finish > 600:  # через промежуток времени нaступает конец игры
                 screen.blit(ork, (65, 20))
                 screen.blit(textR, text)
                 player.pitch -= 1

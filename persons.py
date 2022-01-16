@@ -474,17 +474,11 @@ class FlyEnemy(Enemy):  # класс летющего монстра
                 self.toammo += 1
 
 
-def draw_cursor(screen, posit):
-    screen.blit(cursor_image, posit)
-
 if __name__ == '__main__':
     pygame.init()
     pg.mixer.music.load('Sounds/Theme.mp3')
     pg.mixer.music.play(-1)
     pg.mixer.music.set_volume(0.3)
-
-    cursor_image = load_image('cursor.png', 25, 25)
-    pygame.mouse.set_visible(False)
 
     game = open('Text/game_regim.txt', 'r')
     game_reg = game.readlines()[0]
@@ -572,7 +566,6 @@ if __name__ == '__main__':
                     Gamer.go = 0
                 elif event.key == pygame.K_SPACE:
                     Gamer.fly = False
-            draw_cursor(screen, pygame.mouse.get_pos())
             pygame.display.flip()
 
         if game_reg == 'Campaign':
