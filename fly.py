@@ -141,7 +141,7 @@ if __name__ == '__main__':
     color_map = pg.surfarray.array3d(color_map_img)
     map_height = len(height_map[0])
     map_width = len(height_map)
-    res = width, height = (1280, 720)
+    res = width, height = (800, 400)
     screen = pg.display.set_mode(res, pg.SCALED, vsync=1, depth=1)  # увиличиваем размер окна в 2 раза от scaled
     clock = pg.time.Clock()
     player = Player()
