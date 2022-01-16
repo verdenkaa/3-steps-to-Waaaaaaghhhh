@@ -112,7 +112,7 @@ def draw_game():
                             game.write('Campaign')
                             game.close()
                             pg.mixer.music.pause()
-                            os.system('python persons.py')
+                            os.system('persons.exe')
                             pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
                             pg.mixer.music.play(-1)
                             pg.mixer.music.set_volume(0.5)
@@ -128,7 +128,7 @@ def draw_game():
                                 missia = open('Text/mission_number.txt', 'w')
                                 missia.write('0')
                                 missia.close()
-                                os.system('python fly.py')
+                                os.system('fly.exe')
                                 sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
