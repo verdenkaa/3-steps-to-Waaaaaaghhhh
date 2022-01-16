@@ -90,6 +90,13 @@ def draw_game():
     missia = open('Text/mission_number.txt', 'r')
     num_company = int(missia.readlines()[0])
     missia.close()
+    if num_company == 3:
+        pg.mixer.music.pause()
+        missia = open('Text/mission_number.txt', 'w')
+        missia.write('0')
+        missia.close()
+        os.system('fly.exe')
+        sys.exit()
     monolog(num_company)
     dialog = True
 
@@ -97,6 +104,7 @@ def draw_game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                os.startfile('menu')
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONUP:
                 but_cl()
@@ -112,27 +120,12 @@ def draw_game():
                             game.write('Campaign')
                             game.close()
                             pg.mixer.music.pause()
-                            os.system('python persons.py')
-                            pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
-                            pg.mixer.music.play(-1)
-                            pg.mixer.music.set_volume(0.5)
-                            missia = open('Text/mission_number.txt', 'r')
-                            num_company = int(missia.readlines()[0])
-                            missia.close()
-                            running = False
-                            print(num_company)
-                            monolog(num_company)
-                            dialog = True
-                            if num_company == 3:
-                                pg.mixer.music.pause()
-                                missia = open('Text/mission_number.txt', 'w')
-                                missia.write('0')
-                                missia.close()
-                                os.system('python fly.py')
-                                sys.exit()
+                            os.startfile('persons')
+                            sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
+                    os.startfile('menu')
                     sys.exit()
 
 

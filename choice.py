@@ -146,10 +146,12 @@ if __name__ == '__main__':
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                    os.startfile('menu')
                     sys.exit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         running = False
+                        os.startfile('menu')
                         sys.exit()
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if pygame.mouse.get_pos()[0] > 260 and pygame.mouse.get_pos()[0] < 498:

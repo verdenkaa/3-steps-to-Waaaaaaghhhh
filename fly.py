@@ -4,6 +4,7 @@ import math
 import pygame
 import sys
 from numba import njit
+import os
 
 
 def load_image(name, h, w, colorkey=None):  # функция загрузки спрайтов
@@ -111,6 +112,7 @@ class Player:  # класс игрока
                 screen.blit(FinT, (180, 160))
                 pg.display.flip()
                 pygame.time.delay(2500)
+                os.startfile('menu')
                 sys.exit()
         except IndexError:  # если самолет врезалсяуз за картой
             if self.height <= 0:
@@ -141,7 +143,7 @@ if __name__ == '__main__':
     color_map = pg.surfarray.array3d(color_map_img)
     map_height = len(height_map[0])
     map_width = len(height_map)
-    res = width, height = (1280, 720)
+    res = width, height = (800, 400)
     screen = pg.display.set_mode(res, pg.SCALED, vsync=1, depth=1)  # увиличиваем размер окна в 2 раза от scaled
     clock = pg.time.Clock()
     player = Player()

@@ -44,26 +44,20 @@ def menu_game():
                         game = open('Text/game_regim.txt', 'w')
                         game.write('Infinity')
                         game.close()
-                        os.system('python persons.py')
-                        pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
-                        pg.mixer.music.play(-1)
-                        pg.mixer.music.set_volume(0.5)
+                        os.startfile('persons')
+                        sys.exit()
                 if pygame.mouse.get_pos()[0] > 85.5 and pygame.mouse.get_pos()[0] < 394.5:
                     if pygame.mouse.get_pos()[1] > 105 and pygame.mouse.get_pos()[1] < 150:
                         running = False
                         pg.mixer.music.pause()
-                        os.system('python campaign.py')
-                        pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
-                        pg.mixer.music.play(-1)
-                        pg.mixer.music.set_volume(0.5)
+                        os.startfile('campaign')
+                        sys.exit()
                 if pygame.mouse.get_pos()[0] > 149.5 and pygame.mouse.get_pos()[0] < 340.5:
                     if pygame.mouse.get_pos()[1] > 305 and pygame.mouse.get_pos()[1] < 350:
                         running = False
                         pg.mixer.music.pause()
-                        os.system('python choice.py')
-                        pg.mixer.music.load('Sounds/doom_02. Rip & Tear.mp3')
-                        pg.mixer.music.play(-1)
-                        pg.mixer.music.set_volume(0.5)
+                        os.startfile('choice')
+                        sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False

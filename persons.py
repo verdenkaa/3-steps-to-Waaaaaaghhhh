@@ -3,6 +3,7 @@ import math
 import random
 import pygame as pg
 import sys
+import os
 
 
 def load_image(name, h, w, colorkey=None):  # функция загрузки спрайтов
@@ -130,7 +131,7 @@ class Player(): # Оснвной класс игрока, от которго н
             self.fLose = pygame.font.Font(None, 120)
             self.textRLose = self.fLose.render("Харошый пастук  был!", False, (255, 0, 0))
             self.textLose = self.textRLose.get_rect()
-            self.textLose.center = (600, 400)
+            self.textLose.center = (600, 100)
             screen.blit(self.textRLose, self.textLose)
             end = True
         else:  # наче отображение здоровья
@@ -315,7 +316,7 @@ class Bunker(pygame.sprite.Sprite):  # класс нижней части бун
             self.fLose = pygame.font.Font(None, 120)
             self.textRLose = self.fLose.render("Вот аблом!", False, (255, 0, 0))
             self.textLose = self.textRLose.get_rect()
-            self.textLose.center = (700, 400)
+            self.textLose.center = (700, 100)
             screen.blit(self.textRLose, self.textLose)
 
 
@@ -543,6 +544,7 @@ if __name__ == '__main__':
                     Gamer.trat = 0
                     pygame.time.set_timer(NoDakka, 3000)
                 elif event.key == pygame.K_ESCAPE:
+                    os.startfile('menu')
                     sys.exit()
                 elif event.key == pygame.K_F1:
                     if game_reg == 'Campaign':
@@ -573,25 +575,28 @@ if __name__ == '__main__':
             num_company = int(missia.readlines()[0])
             missia.close()
             if num_company == 0:
-                if score >= 250:
+                if score >= 200:
                     missia = open('Text/mission_number.txt', 'w')
                     pygame.time.delay(1500)
                     missia.write(str(num_company + 1))
                     missia.close()
+                    os.startfile('campaign')
                     sys.exit()
             elif num_company == 1:
-                if score >= 500:
+                if score >= 300:
                     missia = open('Text/mission_number.txt', 'w')
                     pygame.time.delay(1500)
                     missia.write(str(num_company + 1))
                     missia.close()
+                    os.startfile('campaign')
                     sys.exit()
             elif num_company == 2:
-                if score >= 1000:
+                if score >= 400:
                     missia = open('Text/mission_number.txt', 'w')
                     pygame.time.delay(1500)
                     missia.write(str(num_company + 1))
                     missia.close()
+                    os.startfile('campaign')
                     sys.exit()
 
         if time % 100 == 0:  # спавн врагов по счетчику time
@@ -625,6 +630,7 @@ if __name__ == '__main__':
         pygame.display.flip()
         if end:  # конец игры при проигрыше
             pygame.time.delay(1500)
+            os.startfile('menu')
             sys.exit()
         clock.tick(50)
     pygame.quit()
