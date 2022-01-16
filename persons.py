@@ -130,7 +130,7 @@ class Player(): # Оснвной класс игрока, от которго н
             self.fLose = pygame.font.Font(None, 120)
             self.textRLose = self.fLose.render("Харошый пастук  был!", False, (255, 0, 0))
             self.textLose = self.textRLose.get_rect()
-            self.textLose.center = (600, 400)
+            self.textLose.center = (600, 100)
             screen.blit(self.textRLose, self.textLose)
             end = True
         else:  # наче отображение здоровья
@@ -315,7 +315,7 @@ class Bunker(pygame.sprite.Sprite):  # класс нижней части бун
             self.fLose = pygame.font.Font(None, 120)
             self.textRLose = self.fLose.render("Вот аблом!", False, (255, 0, 0))
             self.textLose = self.textRLose.get_rect()
-            self.textLose.center = (700, 400)
+            self.textLose.center = (700, 100)
             screen.blit(self.textRLose, self.textLose)
 
 
