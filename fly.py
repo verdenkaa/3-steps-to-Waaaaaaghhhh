@@ -4,6 +4,7 @@ import math
 import pygame
 import sys
 from numba import njit
+import os
 
 
 def load_image(name, h, w, colorkey=None):  # функция загрузки спрайтов
@@ -111,6 +112,7 @@ class Player:  # класс игрока
                 screen.blit(FinT, (180, 160))
                 pg.display.flip()
                 pygame.time.delay(2500)
+                os.startfile('menu')
                 sys.exit()
         except IndexError:  # если самолет врезалсяуз за картой
             if self.height <= 0:

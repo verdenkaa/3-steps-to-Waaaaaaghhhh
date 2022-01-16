@@ -3,6 +3,7 @@ import math
 import random
 import pygame as pg
 import sys
+import os
 
 
 def load_image(name, h, w, colorkey=None):  # функция загрузки спрайтов
@@ -543,6 +544,7 @@ if __name__ == '__main__':
                     Gamer.trat = 0
                     pygame.time.set_timer(NoDakka, 3000)
                 elif event.key == pygame.K_ESCAPE:
+                    os.startfile('menu')
                     sys.exit()
                 elif event.key == pygame.K_F1:
                     if game_reg == 'Campaign':
@@ -578,6 +580,7 @@ if __name__ == '__main__':
                     pygame.time.delay(1500)
                     missia.write(str(num_company + 1))
                     missia.close()
+                    os.startfile('campaign')
                     sys.exit()
             elif num_company == 1:
                 if score >= 300:
@@ -585,6 +588,7 @@ if __name__ == '__main__':
                     pygame.time.delay(1500)
                     missia.write(str(num_company + 1))
                     missia.close()
+                    os.startfile('campaign')
                     sys.exit()
             elif num_company == 2:
                 if score >= 400:
@@ -592,6 +596,7 @@ if __name__ == '__main__':
                     pygame.time.delay(1500)
                     missia.write(str(num_company + 1))
                     missia.close()
+                    os.startfile('campaign')
                     sys.exit()
 
         if time % 100 == 0:  # спавн врагов по счетчику time
@@ -625,6 +630,7 @@ if __name__ == '__main__':
         pygame.display.flip()
         if end:  # конец игры при проигрыше
             pygame.time.delay(1500)
+            os.startfile('menu')
             sys.exit()
         clock.tick(50)
     pygame.quit()
