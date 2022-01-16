@@ -95,7 +95,7 @@ def draw_game():
         missia = open('Text/mission_number.txt', 'w')
         missia.write('0')
         missia.close()
-        os.system('fly.exe')
+        os.startfile('fly')
         sys.exit()
     monolog(num_company)
     dialog = True
