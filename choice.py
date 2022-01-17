@@ -3,6 +3,7 @@ import os
 import pygame as pg
 import sys
 
+
 class Сhoice_sprite(pygame.sprite.Sprite):
     def __init__(self, name, image_s_x, image_s_y, center_x, center_y):
         pygame.sprite.Sprite.__init__(self)
@@ -40,6 +41,7 @@ def but_cl():
     button_sound = pg.mixer.Sound('Sounds/button-pressing.mp3')
     button_sound.play()
 
+
 def start(num_ork):
     global orks
 
@@ -50,32 +52,33 @@ def start(num_ork):
 
     font_comp = pygame.font.Font(None, 50)
     text_comp = font_comp.render("Ваш орк: ('|_|')", True, (255, 0, 0))
-    text_comp_w = text_comp.get_width() #242
-    text_comp_h = text_comp.get_height() #35
+    text_comp_w = text_comp.get_width()  # 242
+    text_comp_h = text_comp.get_height()  # 35
     screen.blit(text_comp, (0, 10))
     pygame.draw.rect(screen, (255, 0, 0), (0, 10 - 10,
                                            260, text_comp_h + 20), 1)
 
     font_comp = pygame.font.Font(None, 50)
     text_comp = font_comp.render("Следующий", True, (255, 0, 0))
-    text_comp_w = text_comp.get_width() #218
-    text_comp_h = text_comp.get_height() #35
+    text_comp_w = text_comp.get_width()  # 218
+    text_comp_h = text_comp.get_height()  # 35
     screen.blit(text_comp, (270, 90))
     pygame.draw.rect(screen, (0, 0, 0), (270 - 10, 90 - 10,
-                                           text_comp_w + 20, text_comp_h + 20), 2)
+                                         text_comp_w + 20, text_comp_h + 20), 2)
 
     font_comp = pygame.font.Font(None, 50)
     text_comp = font_comp.render("Прошлый", True, (255, 0, 0))
-    text_comp_w = text_comp.get_width() #168
-    text_comp_h = text_comp.get_height() #35
+    text_comp_w = text_comp.get_width()  # 168
+    text_comp_h = text_comp.get_height()  # 35
     screen.blit(text_comp, (300, 180))
     pygame.draw.rect(screen, (0, 0, 0), (270 - 10, 180 - 10,
-                                           text_comp_w + 70, text_comp_h + 20), 2)
+                                         text_comp_w + 70, text_comp_h + 20), 2)
 
     font_comp = pygame.font.Font(None, 39)
-    text_comp = font_comp.render("Немного информации о вашем орке:", True, (255, 0, 0))
-    text_comp_w = text_comp.get_width() #478
-    text_comp_h = text_comp.get_height() #35
+    text_comp = font_comp.render(
+        "Немного информации о вашем орке:", True, (255, 0, 0))
+    text_comp_w = text_comp.get_width()  # 478
+    text_comp_h = text_comp.get_height()  # 35
     screen.blit(text_comp, (0, 300))
     pygame.draw.rect(screen, (255, 0, 0), (0, 300 - 10,
                                            488, text_comp_h + 20), 1)
@@ -90,13 +93,15 @@ def start(num_ork):
     kol_str = text_comp_w // 500
     for i in range(kol_str):
         font_comp = pygame.font.Font(None, 17)
-        text_comp = font_comp.render(ork_info[(len(ork_info) // kol_str) * i:(len(ork_info) // kol_str) * (i + 1)], True, (255, 0, 0))
+        text_comp = font_comp.render(ork_info[(len(
+            ork_info) // kol_str) * i:(len(ork_info) // kol_str) * (i + 1)], True, (255, 0, 0))
         text_comp_w = text_comp.get_width()
         text_comp_h = text_comp.get_height()
         screen.blit(text_comp, (0, 370 + (i * 15)))
     if text_comp_w % 500 != 0:
         font_comp = pygame.font.Font(None, 17)
-        text_comp = font_comp.render(ork_info[(len(ork_info) // kol_str) * kol_str:], True, (255, 0, 0))
+        text_comp = font_comp.render(
+            ork_info[(len(ork_info) // kol_str) * kol_str:], True, (255, 0, 0))
         text_comp_w = text_comp.get_width()
         text_comp_h = text_comp.get_height()
         screen.blit(text_comp, (0, 370 + (kol_str * 15)))
@@ -154,16 +159,20 @@ if __name__ == '__main__':
                         os.startfile('menu')
                         sys.exit()
                 elif event.type == pygame.MOUSEBUTTONUP:
-                    if pygame.mouse.get_pos()[0] > 260 and pygame.mouse.get_pos()[0] < 498:
-                        if pygame.mouse.get_pos()[1] > 80 and pygame.mouse.get_pos()[1] < 135:
+                    if pygame.mouse.get_pos()[0] > 260 and pygame.mouse.get_pos()[
+                            0] < 498:
+                        if pygame.mouse.get_pos()[1] > 80 and pygame.mouse.get_pos()[
+                                1] < 135:
                             but_cl()
                             num_ork += 1
                             if num_ork > len(orks) - 1:
                                 num_ork = 0
                             start(num_ork)
                             pygame.display.update()
-                    if pygame.mouse.get_pos()[0] > 260 and pygame.mouse.get_pos()[0] < 498:
-                        if pygame.mouse.get_pos()[1] > 170 and pygame.mouse.get_pos()[1] < 225:
+                    if pygame.mouse.get_pos()[0] > 260 and pygame.mouse.get_pos()[
+                            0] < 498:
+                        if pygame.mouse.get_pos()[1] > 170 and pygame.mouse.get_pos()[
+                                1] < 225:
                             but_cl()
                             num_ork -= 1
                             if num_ork < 0:

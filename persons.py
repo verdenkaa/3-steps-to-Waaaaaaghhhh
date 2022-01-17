@@ -12,7 +12,7 @@ def load_image(name, h, w, colorkey=None):  # функция загрузки с
     return image
 
 
-def intround(x, left, right): # функция округления числа до заданных диапазонов
+def intround(x, left, right):  # функция округления числа до заданных диапазонов
     if x > right:
         return right
     elif x < left:
@@ -21,18 +21,23 @@ def intround(x, left, right): # функция округления числа �
         return x
 
 
-class Player(): # Оснвной класс игрока, от которго наследуются персонажи
+class Player():  # Оснвной класс игрока, от которго наследуются персонажи
 
-    def __init__(self, patron, person, Bx, By, Lx, Ly, ammo, maxammo, legsmove=100):
+    def __init__(self, patron, person, Bx, By, Lx,
+                 Ly, ammo, maxammo, legsmove=100):
         self.shooting = False
         self.go = False
         self.position = 100, 500
         self.image = load_image(f"/{person}/Body.png", Bx, By)
         self.rect = self.image.get_rect()
-        self.mobs = set(['<Spore Sprite(in 1 groups)>', '<Ground1 Sprite(in 1 groups)>', '<Ground2 Sprite(in 1 groups)>', '<FlyEnemy Sprite(in 1 groups)>', '<Bio Sprite(in 1 groups)>'])
+        self.mobs = set(['<Spore Sprite(in 1 groups)>',
+                         '<Ground1 Sprite(in 1 groups)>',
+                         '<Ground2 Sprite(in 1 groups)>',
+                         '<FlyEnemy Sprite(in 1 groups)>',
+                         '<Bio Sprite(in 1 groups)>'])
         self.rect.center = self.position[0] + 5, self.position[1] + legsmove
         self.healthImage = load_image("Health.png", 40, 40)
-        
+
         self.rect.center = self.position
         self.image2 = load_image(f"/{person}/Legs.png", Lx, Ly)
         self.rect2 = self.image.get_rect()
@@ -63,15 +68,21 @@ class Player(): # Оснвной класс игрока, от которго н
         self.rect2 = self.rect2.move(0, self.fly)
         fly.play()
 
-    def shootFunc(self, rx, ry, mouse_pos0, mouse_pos1, angle):  # Функция стрельбы (запускает класс снаряда)
-        all_sprites.add(self.patron(rx, ry, mouse_pos0, mouse_pos1, angle, self.soundShoot1))
+    # Функция стрельбы (запускает класс снаряда)
+    def shootFunc(self, rx, ry, mouse_pos0, mouse_pos1, angle):
+        all_sprites.add(
+            self.patron(
+                rx,
+                ry,
+                mouse_pos0,
+                mouse_pos1,
+                angle,
+                self.soundShoot1))
         self.cadr = 0
         self.ammo -= self.trat
         if self.dakka and self.ammo < 30:
             self.ammo += self.plusammo
 
-
-    
     def update(self):
         global end
         screen.blit(self.image2, self.rect2)
@@ -79,38 +90,44 @@ class Player(): # Оснвной класс игрока, от которго н
         rx, ry = self.rect.center
 
         angle = math.degrees(math.atan2(ry - mouse_pos[1],
-                                    mouse_pos[0] - rx))  # Вымкряем угол поворота от персонжа до мышки
+                                        mouse_pos[0] - rx))  # Вымкряем угол поворота от персонжа до мышки
 
         if -50 <= angle <= 60:
-            self.rot_image = pygame.transform.rotate(self.image, angle)  # вращаем тело если проходит условие о градусам наклона
+            # вращаем тело если проходит условие о градусам наклона
+            self.rot_image = pygame.transform.rotate(self.image, angle)
 
-        rot_image_rect = self.rot_image.get_rect(center = self.rect.center)
-        rot_image_rect.y += int(-0.5 * intround(angle, -60, 60))  # смещение теля вверх-низ для более коректного отображения без разрывов
+        rot_image_rect = self.rot_image.get_rect(center=self.rect.center)
+        # смещение теля вверх-низ для более коректного отображения без разрывов
+        rot_image_rect.y += int(-0.5 * intround(angle, -60, 60))
         rot_image_rect.x += int(-0.5 * intround(angle, -60, 60))
 
-        if not(pygame.sprite.collide_mask(self, floor)) and not(pygame.sprite.collide_mask(self, bunker)) and not(pygame.sprite.collide_mask(self, bunker2)):  # условие гравитации
+        if not(pygame.sprite.collide_mask(self, floor)) and not(pygame.sprite.collide_mask(
+                self, bunker)) and not(pygame.sprite.collide_mask(self, bunker2)):  # условие гравитации
             self.rect = self.rect.move(0, 7)
             self.rect2 = self.rect2.move(0, 7)
 
-        self.textR = self.f.render(str(round(self.ammo)), False, (255, 0, 0))  # Отображения количества патронов
+        # Отображения количества патронов
+        self.textR = self.f.render(str(round(self.ammo)), False, (255, 0, 0))
         self.text = self.textR.get_rect()
         self.text.center = (40, 40)
         screen.blit(self.textR, self.text)
 
         screen.blit(self.rot_image, rot_image_rect.topleft)
-        
+
         if self.dakka and self.t:  # условие воспроизведения звука сильной атака - Дакка
-                dk = pg.mixer.Sound(f'Sounds/Dakka/{random.randint(1, 7)}.mp3')
-                dk.set_volume(0.4)
-                dk.play()
-                self.t = False
+            dk = pg.mixer.Sound(f'Sounds/Dakka/{random.randint(1, 7)}.mp3')
+            dk.set_volume(0.4)
+            dk.play()
+            self.t = False
         elif not(self.dakka or self.t):
             self.t = True  # t нужна для одиночного воспроизведения звука
-        
-        if (self.dakka  and self.cadr > self.cadrtoshoot // 2 and (-50 <= angle <= 60)) or (self.shooting and self.cadr > self.cadrtoshoot and (-50 <= angle <= 60) and self.ammo > self.trat):
-            self.shootFunc(rx, ry, mouse_pos[0], mouse_pos[1], angle)  # если соблюдены условия запускаем функцию высрела
+
+        if (self.dakka and self.cadr > self.cadrtoshoot // 2 and (-50 <= angle <= 60)) or (
+                self.shooting and self.cadr > self.cadrtoshoot and (-50 <= angle <= 60) and self.ammo > self.trat):
+            # если соблюдены условия запускаем функцию высрела
+            self.shootFunc(rx, ry, mouse_pos[0], mouse_pos[1], angle)
         elif self.cadr > self.cadrtoshoot:
-            self.cadr = self.cadrtoshoot  #cadr нужен для огранчения скоости стрельбы
+            self.cadr = self.cadrtoshoot  # cadr нужен для огранчения скоости стрельбы
             if self.ammo < self.maxammo and self.cadr >= self.cadrtoshoot:
                 self.ammo += self.plusammo  # иначе махинации траты патронов
         else:
@@ -122,19 +139,21 @@ class Player(): # Оснвной класс игрока, от которго н
         if self.fly and not(self.dakka):
             self.flyFunc()
         sprites = pygame.sprite.spritecollide(self, all_sprites, False)
-        sp = set(map(str, sprites))  # список коллайдеорв с которыми пересекается обьект
-        
+        # список коллайдеорв с которыми пересекается обьект
+        sp = set(map(str, sprites))
+
         if self.mobs & sp:
             self.health -= 1  # понижение здоровья при пересечении
 
         if self.health < 1:  # запуск действй смерти
             self.fLose = pygame.font.Font(None, 120)
-            self.textRLose = self.fLose.render("Харошый пастук  был!", False, (255, 0, 0))
+            self.textRLose = self.fLose.render(
+                "Харошый пастук  был!", False, (255, 0, 0))
             self.textLose = self.textRLose.get_rect()
             self.textLose.center = (600, 100)
             screen.blit(self.textRLose, self.textLose)
             end = True
-        else:  # наче отображение здоровья
+        else:  # иначе отображение здоровья
             x, y = 1240, 40
             Hrect = self.healthImage.get_rect()
 
@@ -143,9 +162,6 @@ class Player(): # Оснвной класс игрока, от которго н
                 screen.blit(self.healthImage, Hrect)
                 x -= 40
 
-
-        
-            
 
 class Nobz(Player):
 
@@ -164,14 +180,26 @@ class Flash(Player):
         self.health = 6
 
     def shootFunc(self, rx, ry, mouse_pos0, mouse_pos1, angle):
-        all_sprites.add(self.patron(rx, ry, mouse_pos0, mouse_pos1, angle, self.soundShoot1))
-        all_sprites.add(self.patron(rx, ry + random.randint(-40, 40), mouse_pos0, mouse_pos1 + random.randint(-40, 40), angle, self.soundShoot1))
+        all_sprites.add(
+            self.patron(
+                rx,
+                ry,
+                mouse_pos0,
+                mouse_pos1,
+                angle,
+                self.soundShoot1))
+        all_sprites.add(self.patron(rx,
+                                    ry + random.randint(-40, 40),
+                                    mouse_pos0,
+                                    mouse_pos1 + random.randint(-40, 40),
+                                    angle,
+                                    self.soundShoot1))
         self.cadr = 0
         self.ammo -= self.trat
         if self.dakka and self.ammo < 60:
             self.ammo += self.plusammo
 
-    
+
 class Tank(Player):
 
     def __init__(self, patron):
@@ -196,8 +224,8 @@ class Meh(Player):
         self.soundShoot1 = pg.mixer.Sound('Sounds/blast.mp3')
 
 
-class Snarad(pygame.sprite.Sprite):  # основной класс снаряда, от котрого наследуюся остальные
-    
+class Snarad(
+        pygame.sprite.Sprite):  # основной класс снаряда, от котрого наследуюся остальные
 
     def __init__(self, x, y, x2, y2, angle, sound, dlin, shir, im="bolt.png"):
         super().__init__(all_sprites)
@@ -216,20 +244,24 @@ class Snarad(pygame.sprite.Sprite):  # основной класс снаряд�
         self.speed = 10
         sound.set_volume(0.2)
         sound.play()
-        self.mobs = set(['<Spore Sprite(in 1 groups)>', '<Ground1 Sprite(in 1 groups)>', '<Floor Sprite(in 1 groups)>', '<Ground2 Sprite(in 1 groups)>'])
+        self.mobs = set(['<Spore Sprite(in 1 groups)>',
+                         '<Ground1 Sprite(in 1 groups)>',
+                         '<Floor Sprite(in 1 groups)>',
+                         '<Ground2 Sprite(in 1 groups)>'])
 
-        
     def update(self):
-        if pygame.sprite.collide_mask(self, bunker) or pygame.sprite.collide_mask(self, bunker2) or pygame.sprite.collide_mask(self, trub):
+        if pygame.sprite.collide_mask(self, bunker) or pygame.sprite.collide_mask(
+                self, bunker2) or pygame.sprite.collide_mask(self, trub):
             self.kill()  # уничтожение пр и столкновении
         sp = set(map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
         if self.mobs & sp:
             self.kill()   # тут тоже
         if self.i > 70:
             self.kill()  # это ограничение по дальности стрельбы, что-бы не нагружать систему
-        self.rect = self.rect.move((self.x2 - self.x) // self.speed, (self.y2 - self.y) // self.speed)
+        self.rect = self.rect.move(
+            (self.x2 - self.x) // self.speed,
+            (self.y2 - self.y) // self.speed)
         self.i += 1
-
 
 
 class Bolt(Snarad):
@@ -238,7 +270,7 @@ class Bolt(Snarad):
         super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 30, 10, "bolt.png")
         self.speed = 10
 
-   
+
 class Zap(Snarad):
 
     def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound, ):
@@ -266,11 +298,12 @@ class Bio(Snarad):
     def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound):
         super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 20, 20, "bio.png")
         self.speed = 40
-        self.mobs = set(['<Bunker Sprite(in 1 groups)>', '<Bunker2 Sprite(in 1 groups)>'])
-    
+        self.mobs = set(['<Bunker Sprite(in 1 groups)>',
+                        '<Bunker2 Sprite(in 1 groups)>'])
 
     def update(self):  # вынужденая перегрузна функции так-как снарядом стреляет враг в персонажа
-        if pygame.sprite.collide_mask(self, bunker) or pygame.sprite.collide_mask(self, bunker2):
+        if pygame.sprite.collide_mask(
+                self, bunker) or pygame.sprite.collide_mask(self, bunker2):
             self.kill()
         sp = set(map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
         if self.mobs & sp:
@@ -278,8 +311,11 @@ class Bio(Snarad):
             self.kill()
         if self.i > 70:
             self.kill()
-        self.rect = self.rect.move((self.x2 - self.x) // self.speed, (self.y2 - self.y) // self.speed)
+        self.rect = self.rect.move(
+            (self.x2 - self.x) // self.speed,
+            (self.y2 - self.y) // self.speed)
         self.i += 1
+
 
 class Floor(pygame.sprite.Sprite):  # класс пола
     image = load_image("floor.png", 1280, 50)
@@ -307,14 +343,16 @@ class Bunker(pygame.sprite.Sprite):  # класс нижней части бун
 
     def update(self):
         global end
-        self.textR = self.f.render(str(round(self.Health)), False, (50, 200, 0))  # отображение текста
+        self.textR = self.f.render(
+            str(round(self.Health)), False, (50, 200, 0))  # отображение текста
         self.text = self.textR.get_rect()
         self.text.center = (100, 40)
         screen.blit(self.textR, self.text)
         if self.Health < 1:  # запуск конца при уничтожении
             end = True
             self.fLose = pygame.font.Font(None, 120)
-            self.textRLose = self.fLose.render("Вот аблом!", False, (255, 0, 0))
+            self.textRLose = self.fLose.render(
+                "Вот аблом!", False, (255, 0, 0))
             self.textLose = self.textRLose.get_rect()
             self.textLose.center = (700, 100)
             screen.blit(self.textRLose, self.textLose)
@@ -332,7 +370,8 @@ class Bunker2(pygame.sprite.Sprite):  # второй этаж, здоровье 
         self.rect.x += 30
 
 
-class Truba(pygame.sprite.Sprite):  # Трубка мешающая трелять с неподходящего этажа
+class Truba(
+        pygame.sprite.Sprite):  # Трубка мешающая трелять с неподходящего этажа
     image = load_image("truba.png", 900, 200)
 
     def __init__(self):
@@ -361,20 +400,21 @@ class Enemy(pygame.sprite.Sprite):  # родительский класс наз
         self.sounddead = pg.mixer.Sound('Sounds/Dead.mp3')
         self.sounddead.set_volume(0.2)
         self.points = 1
-        
 
     def update(self):
         global score
         if self.dead:
             if self.dead != True:  # запуск анимации смерти
-                self.image = load_image(f"Tyranids/Dead/{self.dead // 3}.png", self.x, self.y)
+                self.image = load_image(
+                    f"Tyranids/Dead/{self.dead // 3}.png", self.x, self.y)
                 if self.dead < 21:
                     self.dead += 1
                 else:
                     self.kill()
         else:
             self.rect = self.rect.move(self.move, 0)
-            sp = tuple(map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
+            sp = tuple(
+                map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
             if '<Bolt Sprite(in 1 groups)>' in sp:
                 self.health -= 1
             elif '<MiniBolt Sprite(in 1 groups)>' in sp:
@@ -439,7 +479,8 @@ class FlyEnemy(Enemy):  # класс летющего монстра
     def update(self):
         if self.dead:  # анмация смерти
             if self.dead != True:
-                self.image = load_image(f"Tyranids/Dead/{self.dead // 3}.png", self.x, self.y)
+                self.image = load_image(
+                    f"Tyranids/Dead/{self.dead // 3}.png", self.x, self.y)
                 self.rect = self.rect.move(0, 2)
                 if self.dead < 21:
                     self.dead += 1
@@ -447,7 +488,9 @@ class FlyEnemy(Enemy):  # класс летющего монстра
                     self.kill()
         else:
             self.rect = self.rect.move(self.move, 0)
-            sp = tuple(map(str, pygame.sprite.spritecollide(self, all_sprites, False)))  # нниже получение урона от пересечения с обьектами
+            # нниже получение урона от пересечения с обьектами
+            sp = tuple(
+                map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
             if '<Bolt Sprite(in 1 groups)>' in sp:
                 self.health -= 1
             elif '<MiniBolt Sprite(in 1 groups)>' in sp:
@@ -469,8 +512,13 @@ class FlyEnemy(Enemy):  # класс летющего монстра
             if self.toammo >= 80:
                 self.toammo = 0
                 angle = math.degrees(math.atan2(self.rect.x - Gamer.rect.x,
-                                    self.rect.y - Gamer.rect.y))
-                all_sprites.add(Bio(self.rect.x + 50, self.rect.y + 80, Gamer.rect2.x, Gamer.rect2.y, angle, self.sound))
+                                                self.rect.y - Gamer.rect.y))
+                all_sprites.add(Bio(self.rect.x + 50,
+                                    self.rect.y + 80,
+                                    Gamer.rect2.x,
+                                    Gamer.rect2.y,
+                                    angle,
+                                    self.sound))
             else:
                 self.toammo += 1
 
@@ -502,7 +550,9 @@ if __name__ == '__main__':
     text = textR.get_rect()
     text.center = (640, 40)
     pygame.time.delay(1500)
-    ork_pl = open('Text/player_ork.txt', 'r').readlines()[0]  # определение персонажа
+    ork_pl = open(
+        'Text/player_ork.txt',
+        'r').readlines()[0]  # определение персонажа
     if ork_pl == 'Nob':
         Gamer = Nobz(Bolt)
     elif ork_pl == 'Flash':
@@ -511,7 +561,6 @@ if __name__ == '__main__':
         Gamer = Tank(Zap)
     elif ork_pl == 'Meh':
         Gamer = Meh(Blast)
-
 
     floor = Floor()
     bunker = Bunker()
@@ -555,12 +604,10 @@ if __name__ == '__main__':
                         elif num_company == 2:
                             score = 1500
 
-
-            
             if event.type == NoDakka:
                 Gamer.dakka = False
                 Gamer.trat = 1
-                    
+
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_d:
                     Gamer.go = 0
@@ -607,7 +654,9 @@ if __name__ == '__main__':
             all_sprites.add(Ground2())
         if time % 500 == 0:
             all_sprites.add(FlyEnemy())
-        if time % 3000 == 0:  # и в нужный момент увеличение фазы игры (всего 3, но больше прожить и не получится)
+        # и в нужный момент увеличение фазы игры (всего 3, но больше прожить и
+        # не получится)
+        if time % 3000 == 0:
             if gamephaz == 1:
                 gamephaz = 2
             elif gamephaz == 2:
@@ -622,7 +671,8 @@ if __name__ == '__main__':
         all_sprites.draw(screen)
         Gamer.update()
 
-        textR = f.render(str(round(score)), False, (200, 200, 200))  # отображение очков
+        textR = f.render(str(round(score)), False,
+                         (200, 200, 200))  # отображение очков
         text = textR.get_rect()
         text.center = (640, 40)
 

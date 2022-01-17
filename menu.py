@@ -3,6 +3,7 @@ import os
 import pygame as pg
 import sys
 
+
 class Menu_sprite(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -37,8 +38,10 @@ def menu_game():
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONUP:
                 but_cl()
-                if pygame.mouse.get_pos()[0] > 63 and pygame.mouse.get_pos()[0] < 417:
-                    if pygame.mouse.get_pos()[1] > 205 and pygame.mouse.get_pos()[1] < 250:
+                if pygame.mouse.get_pos()[0] > 63 and pygame.mouse.get_pos()[
+                        0] < 417:
+                    if pygame.mouse.get_pos()[1] > 205 and pygame.mouse.get_pos()[
+                            1] < 250:
                         running = False
                         pg.mixer.music.pause()
                         game = open('Text/game_regim.txt', 'w')
@@ -46,14 +49,18 @@ def menu_game():
                         game.close()
                         os.startfile('persons')
                         sys.exit()
-                if pygame.mouse.get_pos()[0] > 85.5 and pygame.mouse.get_pos()[0] < 394.5:
-                    if pygame.mouse.get_pos()[1] > 105 and pygame.mouse.get_pos()[1] < 150:
+                if pygame.mouse.get_pos()[0] > 85.5 and pygame.mouse.get_pos()[
+                        0] < 394.5:
+                    if pygame.mouse.get_pos()[1] > 105 and pygame.mouse.get_pos()[
+                            1] < 150:
                         running = False
                         pg.mixer.music.pause()
                         os.startfile('campaign')
                         sys.exit()
-                if pygame.mouse.get_pos()[0] > 149.5 and pygame.mouse.get_pos()[0] < 340.5:
-                    if pygame.mouse.get_pos()[1] > 305 and pygame.mouse.get_pos()[1] < 350:
+                if pygame.mouse.get_pos()[0] > 149.5 and pygame.mouse.get_pos()[
+                        0] < 340.5:
+                    if pygame.mouse.get_pos()[1] > 305 and pygame.mouse.get_pos()[
+                            1] < 350:
                         running = False
                         pg.mixer.music.pause()
                         os.startfile('choice')
@@ -76,24 +83,24 @@ def draw_menu():
 
     font_comp = pygame.font.Font(None, 50)
     text_comp = font_comp.render("Сюжетный режим", True, (255, 0, 0))
-    text_comp_w = text_comp.get_width() #309
-    text_comp_h = text_comp.get_height() #35
+    text_comp_w = text_comp.get_width()  # 309
+    text_comp_h = text_comp.get_height()  # 35
     screen.blit(text_comp, (95.5, 115))
     pygame.draw.rect(screen, (255, 0, 0), (95.5 - 10, 115 - 10,
                                            text_comp_w + 20, text_comp_h + 20), 1)
 
     font_inf = pygame.font.Font(None, 50)
     text_inf = font_inf.render("Бесконечный режим", True, (255, 0, 0))
-    text_inf_w = text_inf.get_width() #354
-    text_inf_h = text_inf.get_height() #35
+    text_inf_w = text_inf.get_width()  # 354
+    text_inf_h = text_inf.get_height()  # 35
     screen.blit(text_inf, (73, 215))
     pygame.draw.rect(screen, (255, 0, 0), (73 - 10, 215 - 10,
                                            text_inf_w + 20, text_inf_h + 20), 1)
 
     font_pref = pygame.font.Font(None, 50)
     text_pref = font_pref.render("Персонажи", True, (255, 0, 0))
-    text_pref_w = text_pref.get_width() #181
-    text_pref_h = text_pref.get_height() #35
+    text_pref_w = text_pref.get_width()  # 181
+    text_pref_h = text_pref.get_height()  # 35
     screen.blit(text_pref, (159.5, 315))
     pygame.draw.rect(screen, (255, 0, 0), (159.5 - 10, 315 - 10,
                                            text_pref_w + 20, text_pref_h + 20), 1)

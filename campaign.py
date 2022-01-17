@@ -4,6 +4,7 @@ import pygame as pg
 import sys
 from random import randint
 
+
 class Menu_sprite(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -18,6 +19,7 @@ def load_image(name, h, w, colorkey=None):
     image = pygame.transform.scale(image, (h, w))
     return image
 
+
 def load_ork(name, colorkey=None):
     fullname = 'Sprites/' + name
 
@@ -30,6 +32,7 @@ def load_ork(name, colorkey=None):
     else:
         image = image.convert_alpha()
     return image
+
 
 def but_cl():
     button_sound = pg.mixer.Sound('Sounds/button-pressing.mp3')
@@ -69,19 +72,23 @@ def monolog(missia_n):
     kol_str = text_comp_w // 700
     for j in range(kol_str):
         font_comp = pygame.font.Font(None, 50)
-        text_comp = font_comp.render(ork_dialog[(len(ork_dialog) // kol_str) * j:(len(ork_dialog) // kol_str) * (j + 1)], True, (255, 0, 0))
+        text_comp = font_comp.render(ork_dialog[(len(
+            ork_dialog) // kol_str) * j:(len(ork_dialog) // kol_str) * (j + 1)], True, (255, 0, 0))
         text_comp_w = text_comp.get_width()
         screen.blit(text_comp, (150, 400 + (j * 34)))
     if text_comp_w % 700 != 0:
         font_comp = pygame.font.Font(None, 50)
-        text_comp = font_comp.render(ork_dialog[(len(ork_dialog) // kol_str) * kol_str:], True, (255, 0, 0))
+        text_comp = font_comp.render(
+            ork_dialog[(len(ork_dialog) // kol_str) * kol_str:], True, (255, 0, 0))
         text_comp_w = text_comp.get_width()
         screen.blit(text_comp, (150, 400 + (kol_str * 34)))
     if missia_n == 3:
         print(1)
-        pygame.draw.rect(screen, (255, 0, 0), (140, 390, 920, 68 + (kol_str * 34)), 1)
+        pygame.draw.rect(screen, (255, 0, 0),
+                         (140, 390, 920, 68 + (kol_str * 34)), 1)
     else:
-        pygame.draw.rect(screen, (255, 0, 0), (140, 390, 820, 68 + (kol_str * 34)), 1)
+        pygame.draw.rect(screen, (255, 0, 0),
+                         (140, 390, 820, 68 + (kol_str * 34)), 1)
     pygame.display.update()
 
 
@@ -115,8 +122,10 @@ def draw_game():
                         print(1)
                         dialog = False
                 if not dialog:
-                    if pygame.mouse.get_pos()[0] > coord[0] and pygame.mouse.get_pos()[0] < (coord[0] + 40):
-                        if pygame.mouse.get_pos()[1] > coord[1] and pygame.mouse.get_pos()[1] < (coord[1] + 40):
+                    if pygame.mouse.get_pos()[0] > coord[0] and pygame.mouse.get_pos()[
+                            0] < (coord[0] + 40):
+                        if pygame.mouse.get_pos()[1] > coord[1] and pygame.mouse.get_pos()[
+                                1] < (coord[1] + 40):
                             game = open('Text/game_regim.txt', 'w')
                             game.write('Campaign')
                             game.close()

@@ -13,9 +13,9 @@ def load_image(name, h, w, colorkey=None):  # функция загрузки с
     return image
 
 
-@njit(fastmath=True)  # 
+@njit(fastmath=True)  #
 def ray_casting(screen_array, player_pos, player_angle, player_height, player_pitch,
-                     screen_width, screen_height, delta_angle, ray_distance, h_fov, scale_height):
+                screen_width, screen_height, delta_angle, ray_distance, h_fov, scale_height):
 
     screen_array[:] = np.array([211, 180, 155])  # цвет фона
     y_buffer = np.full(screen_width, screen_height)
@@ -39,7 +39,8 @@ def ray_casting(screen_array, player_pos, player_angle, player_height, player_pi
 
                     # обрезка краев
                     if not first_contact:
-                        y_buffer[num_ray] = min(height_on_screen, screen_height)
+                        y_buffer[num_ray] = min(
+                            height_on_screen, screen_height)
                         first_contact = True
 
                     # удаление бага с отзеркаливанием
@@ -48,14 +49,10 @@ def ray_casting(screen_array, player_pos, player_angle, player_height, player_pi
 
                     # отрисовка линий
                     if height_on_screen < y_buffer[num_ray]:
-                        for screen_y in range(height_on_screen, y_buffer[num_ray]):
+                        for screen_y in range(
+                                height_on_screen, y_buffer[num_ray]):
                             screen_array[num_ray, screen_y] = color_map[x, y]
                         y_buffer[num_ray] = height_on_screen
-
-
-
-                    
-                
 
         ray_angle += delta_angle
     return screen_array
@@ -102,12 +99,14 @@ class Player:  # класс игрока
         sin_a = math.sin(self.angle)
         cos_a = math.cos(self.angle)
 
-        self.pos[0] += self.vel * cos_a * self.speedK  # перемещаем самолет в зависимости от скорости
+        # перемещаем самолет в зависимости от скорости
+        self.pos[0] += self.vel * cos_a * self.speedK
         self.pos[1] += self.vel * sin_a * self.speedK
         self.height += self.vel * self.pitch / 200
 
         try:
-            if self.height <= height_map[int(self.pos[0])][int(self.pos[1])][0]:  # если самолет врезается
+            if self.height <= height_map[int(self.pos[0])][int(
+                    self.pos[1])][0]:  # если самолет врезается
                 boom.play()
                 screen.blit(FinT, (180, 160))
                 pg.display.flip()
@@ -123,7 +122,7 @@ class Player:  # класс игрока
                 sys.exit()
 
         pressed_key = pg.key.get_pressed()  # ниже управление
-        
+
         if pressed_key[pg.K_w]:
             self.pitch -= self.fly_angele
         if pressed_key[pg.K_s]:
@@ -144,7 +143,8 @@ if __name__ == '__main__':
     map_height = len(height_map[0])
     map_width = len(height_map)
     res = width, height = (800, 400)
-    screen = pg.display.set_mode(res, pg.SCALED, vsync=1, depth=1)  # увиличиваем размер окна в 2 раза от scaled
+    # увиличиваем размер окна в 2 раза от scaled
+    screen = pg.display.set_mode(res, pg.SCALED, vsync=1, depth=1)
     clock = pg.time.Clock()
     player = Player()
     voxel_render = VoxelRender(screen, width, height, player)
@@ -161,25 +161,25 @@ if __name__ == '__main__':
     ork_type.close()
     ork = load_image(f'{orks[num_ork]}/Body.png', 65, 100)
     f = pygame.font.Font(None, 30)
-    textR = f.render("Босс йа понять как счетать до три!", False, (200, 100, 100))
+    textR = f.render("Босс йа понять как счетать до три!",
+                     False, (200, 100, 100))
     text = textR.get_rect()
     text.center = (270, 30)
     f = pygame.font.Font(None, 60)
     FinT = f.render("Это конец, зог", False, (200, 10, 10))
     pg.display.set_caption('Мы лэтым!')
-    
 
     while True:
-            player.update()
-            voxel_render.update()
-            voxel_render.draw()
-            screen.blit(kabin, (0, 0))
-            if finish > 600:  # через промежуток времени нaступает конец игры
-                screen.blit(ork, (65, 20))
-                screen.blit(textR, text)
-                player.pitch -= 1
-                player.fly_angele = 0
-            pg.display.flip()
-            [exit() for i in pg.event.get() if i.type == pg.QUIT]
-            clock.tick(60)
-            finish += 1
+        player.update()
+        voxel_render.update()
+        voxel_render.draw()
+        screen.blit(kabin, (0, 0))
+        if finish > 600:  # через промежуток времени нaступает конец игры
+            screen.blit(ork, (65, 20))
+            screen.blit(textR, text)
+            player.pitch -= 1
+            player.fly_angele = 0
+        pg.display.flip()
+        [exit() for i in pg.event.get() if i.type == pg.QUIT]
+        clock.tick(60)
+        finish += 1
