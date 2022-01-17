@@ -90,14 +90,15 @@ def draw_game():
     missia = open('Text/mission_number.txt', 'r')
     num_company = int(missia.readlines()[0])
     missia.close()
+    monolog(num_company)
     if num_company == 3:
         pg.mixer.music.pause()
         missia = open('Text/mission_number.txt', 'w')
         missia.write('0')
         missia.close()
+        pygame.time.wait(5000)
         os.startfile('fly')
         sys.exit()
-    monolog(num_company)
     dialog = True
 
     while running:
