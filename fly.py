@@ -13,14 +13,16 @@ def load_image(name, h, w, colorkey=None):  # функция загрузки с
     return image
 
 
-@njit(fastmath=True)  #
-def ray_casting(screen_array, player_pos, player_angle, player_height, player_pitch,
-                screen_width, screen_height, delta_angle, ray_distance, h_fov, scale_height):
+# нжит для ускорения отрисовки (с 2 fps поднимается до 40~60 fps)
+@njit(fastmath=True)
+def ray_casting(screen_array, player_pos, player_angle, player_height,
+                player_pitch, screen_width, screen_height, delta_angle,
+                ray_distance, h_fov, scale_height):
 
-    screen_array[:] = np.array([211, 180, 155])  # цвет фона
-    y_buffer = np.full(screen_width, screen_height)
+    screen_array[:] = np.array([211, 180, 155])  # заполнить массив цветом фона
+    y_buffer = np.full(screen_width, screen_height)  # буфер для каждого луча
 
-    ray_angle = player_angle - h_fov  # угол выстрела луча
+    ray_angle = player_angle - h_fov  # угол первого луча
     for num_ray in range(screen_width):
         first_contact = False
         sin_a = math.sin(ray_angle)
@@ -34,7 +36,8 @@ def ray_casting(screen_array, player_pos, player_angle, player_height, player_pi
 
                     # Удаление эффекта рыбьего глаза
                     depth *= math.cos(player_angle - ray_angle)
-                    height_on_screen = int((player_height - height_map[x, y][0]) /
+                    height_on_screen = int((player_height -
+                                            height_map[x, y][0]) /
                                            depth * scale_height + player_pitch)
 
                     # обрезка краев
@@ -64,20 +67,22 @@ class VoxelRender:  # класс рендера экрана
         self.player = player
         self.width = width
         self.height = height
-        self.fov = math.pi / 5
-        self.h_fov = self.fov / 3
-        self.num_rays = width
-        self.delta_angle = self.fov / self.num_rays
-        self.ray_distance = 4000
-        self.scale_height = 900
+        self.fov = math.pi / 5  # горизонтальное поле зрение
+        self.h_fov = self.fov / 3  # вертикальное поле зрения
+        self.num_rays = width  # количество лучей
+        self.delta_angle = self.fov / self.num_rays  # угол между лучами
+        self.ray_distance = 4000  # длина луча(отрисовки)
+        self.scale_height = 900  # кофф масштабирования
+        # массив экрана для вывода изображения
         self.screen_array = np.full((width, height, 3), (0, 0, 10))
-        print(self.screen_array[0])
 
     def update(self):
-        self.screen_array = ray_casting(self.screen_array, self.player.pos, self.player.angle,
-                                        self.player.height, self.player.pitch, self.width,
-                                        self.height, self.delta_angle, self.ray_distance,
-                                        self.h_fov, self.scale_height)
+        self.screen_array = ray_casting(self.screen_array, self.player.pos,
+                                        self.player.angle, self.player.height,
+                                        self.player.pitch, self.width,
+                                        self.height, self.delta_angle,
+                                        self.ray_distance, self.h_fov,
+                                        self.scale_height)
 
     def draw(self):
         pg.surfarray.blit_array(self.screen, self.screen_array)
@@ -85,12 +90,13 @@ class VoxelRender:  # класс рендера экрана
 
 class Player:  # класс игрока
     def __init__(self):
+        # старовые координаты самолета
         self.pos = np.array([1700, 800], dtype=float)
-        self.angle = 273.5
-        self.height = 40
-        self.pitch = 30
-        self.angle_vel = 0.005
-        self.vel = 1
+        self.angle = 273.5  # начальный угол поворота самолета
+        self.height = 40  # высота старта
+        self.pitch = 30  # наклон ипри старте
+        self.angle_vel = 0.005  # скорость поворота
+        self.vel = 1  # скорость перемещения
         self.speedK = 2
         self.fly_angele = 1
         pygame.mouse.set_visible(False)
@@ -113,7 +119,7 @@ class Player:  # класс игрока
                 pygame.time.delay(2500)
                 os.startfile('menu')
                 sys.exit()
-        except IndexError:  # если самолет врезалсяуз за картой
+        except IndexError:  # если самолет ниже уровня за картой
             if self.height <= 0:
                 boom.play()
                 screen.blit(FinT, (180, 160))
@@ -149,16 +155,17 @@ if __name__ == '__main__':
     player = Player()
     voxel_render = VoxelRender(screen, width, height, player)
     kabin = pygame.image.load(f"Sprites/kabina.png")
-    kabin = pygame.transform.scale(kabin, (width, height))
-    pg.mixer.music.load('Sounds/samolet.mp3')
+    kabin = pygame.transform.scale(kabin, (width, height))  # спрайт самолета
+    pg.mixer.music.load('Sounds/samolet.mp3')  # звук полета
     pg.mixer.music.play(-1)
     pg.mixer.music.set_volume(1)
-    boom = pg.mixer.Sound('Sounds/boombaby.mp3')
-    finish = 0
+    boom = pg.mixer.Sound('Sounds/boombaby.mp3')  # звук взрыва при падении
+    finish = 0  # счетчик для запуска конца игры
     orks = ['Nob', 'Flash', 'Tank', 'Meh']
     ork_type = open('Text/player_ork.txt', 'r')
     num_ork = orks.index(ork_type.readlines()[0])
     ork_type.close()
+    # загрузка спрайта нужного орка
     ork = load_image(f'{orks[num_ork]}/Body.png', 65, 100)
     f = pygame.font.Font(None, 30)
     textR = f.render("Босс йа понять как счетать до три!",
@@ -177,9 +184,12 @@ if __name__ == '__main__':
         if finish > 600:  # через промежуток времени нaступает конец игры
             screen.blit(ork, (65, 20))
             screen.blit(textR, text)
-            player.pitch -= 1
-            player.fly_angele = 0
+            player.pitch -= 1  # угол понижается вниз
+            player.fly_angele = 0  # тангаж становится невозможным
         pg.display.flip()
-        [exit() for i in pg.event.get() if i.type == pg.QUIT]
+        for i in pg.event.get():
+            if i.type == pg.QUIT:
+                sys.exit()
         clock.tick(60)
         finish += 1
+

@@ -12,7 +12,8 @@ def load_image(name, h, w, colorkey=None):  # функция загрузки с
     return image
 
 
-def intround(x, left, right):  # функция округления числа до заданных диапазонов
+# функция округления числа до заданных диапазонов
+def intround(x, left, right):
     if x > right:
         return right
     elif x < left:
@@ -25,39 +26,44 @@ class Player():  # Оснвной класс игрока, от которго �
 
     def __init__(self, patron, person, Bx, By, Lx,
                  Ly, ammo, maxammo, legsmove=100):
-        self.shooting = False
-        self.go = False
+        self.shooting = False  # статус стрельбы
+        self.go = False  # статус ходьбы
         self.position = 100, 500
         self.image = load_image(f"/{person}/Body.png", Bx, By)
         self.rect = self.image.get_rect()
+        # список тех, от кого прилетает урон
         self.mobs = set(['<Spore Sprite(in 1 groups)>',
                          '<Ground1 Sprite(in 1 groups)>',
                          '<Ground2 Sprite(in 1 groups)>',
                          '<FlyEnemy Sprite(in 1 groups)>',
                          '<Bio Sprite(in 1 groups)>'])
         self.rect.center = self.position[0] + 5, self.position[1] + legsmove
-        self.healthImage = load_image("Health.png", 40, 40)
+        self.healthImage = load_image(
+            "Health.png", 40, 40)  # изображение сердечек
 
         self.rect.center = self.position
         self.image2 = load_image(f"/{person}/Legs.png", Lx, Ly)
         self.rect2 = self.image.get_rect()
         self.rect2.center = self.position[0] + 5, self.position[1] + legsmove
         self.rot_image = self.image
-        self.cadr = 0
-        self.fly = False
+        self.cadr = 0  # счетчик для стрельбы
+        self.fly = False  # статус полета
         self.ammo = ammo
         self.maxammo = maxammo
-        self.trat = 1
-        self.dakka = False
+        self.trat = 1  # переманая траты патрон
+        self.dakka = False  # статус ускоренной стрельбы
         self.f = pygame.font.Font(None, 40)
         self.patron = patron
-        self.soundShoot1 = pg.mixer.Sound('Sounds/boltshoot.mp3')
-        self.plusammo = 0.5
+        self.soundShoot1 = pg.mixer.Sound(
+            'Sounds/boltshoot.mp3')  # звук выстрела по умолчанию
+        self.plusammo = 0.5  # регенерация патрон
+        # значение счетчика для стрельбы(регулирует скорость)
         self.cadrtoshoot = 5
         self.todakka = 0
+        # для одноразового воспроизведения звука ускренной стрельбы(ниже)
         self.t = True
         self.timer = 200
-        self.health = 10
+        self.health = 10  # здоровье
 
     def goFunc(self):  # Функция ходьбы
         self.rect = self.rect.move(self.go, 0)
@@ -78,33 +84,37 @@ class Player():  # Оснвной класс игрока, от которго �
                 mouse_pos1,
                 angle,
                 self.soundShoot1))
-        self.cadr = 0
+        self.cadr = 0  # сброс счетчика
         self.ammo -= self.trat
         if self.dakka and self.ammo < 30:
-            self.ammo += self.plusammo
+            self.ammo += self.plusammo  # регенерация патрон
 
     def update(self):
         global end
-        screen.blit(self.image2, self.rect2)
+        screen.blit(self.image2, self.rect2)  # отрисовка ног
         mouse_pos = pygame.mouse.get_pos()
         rx, ry = self.rect.center
 
+        # Вымеряем угол поворота от персонжа до мышки
         angle = math.degrees(math.atan2(ry - mouse_pos[1],
-                                        mouse_pos[0] - rx))  # Вымкряем угол поворота от персонжа до мышки
+                                        mouse_pos[0] - rx))
 
         if -50 <= angle <= 60:
             # вращаем тело если проходит условие о градусам наклона
             self.rot_image = pygame.transform.rotate(self.image, angle)
 
         rot_image_rect = self.rot_image.get_rect(center=self.rect.center)
-        # смещение теля вверх-низ для более коректного отображения без разрывов
+        # смещение теля вверх-низ для более коректного отображения тушки без
+        # разрывов
         rot_image_rect.y += int(-0.5 * intround(angle, -60, 60))
         rot_image_rect.x += int(-0.5 * intround(angle, -60, 60))
 
-        if not(pygame.sprite.collide_mask(self, floor)) and not(pygame.sprite.collide_mask(
-                self, bunker)) and not(pygame.sprite.collide_mask(self, bunker2)):  # условие гравитации
-            self.rect = self.rect.move(0, 7)
-            self.rect2 = self.rect2.move(0, 7)
+        # условия гравитации
+        if not(pygame.sprite.collide_mask(self, floor)):
+            if not(pygame.sprite.collide_mask(self, bunker)):
+                if not(pygame.sprite.collide_mask(self, bunker2)):
+                    self.rect = self.rect.move(0, 7)
+                    self.rect2 = self.rect2.move(0, 7)
 
         # Отображения количества патронов
         self.textR = self.f.render(str(round(self.ammo)), False, (255, 0, 0))
@@ -112,9 +122,12 @@ class Player():  # Оснвной класс игрока, от которго �
         self.text.center = (40, 40)
         screen.blit(self.textR, self.text)
 
+        # отображение тела, отдельно от группы спрайтов, для большей
+        # производительности(падает в группе из-за вращения)
         screen.blit(self.rot_image, rot_image_rect.topleft)
 
-        if self.dakka and self.t:  # условие воспроизведения звука сильной атака - Дакка
+        # условие воспроизведения звука сильной атака - Дакка
+        if self.dakka and self.t:
             dk = pg.mixer.Sound(f'Sounds/Dakka/{random.randint(1, 7)}.mp3')
             dk.set_volume(0.4)
             dk.play()
@@ -122,12 +135,15 @@ class Player():  # Оснвной класс игрока, от которго �
         elif not(self.dakka or self.t):
             self.t = True  # t нужна для одиночного воспроизведения звука
 
-        if (self.dakka and self.cadr > self.cadrtoshoot // 2 and (-50 <= angle <= 60)) or (
-                self.shooting and self.cadr > self.cadrtoshoot and (-50 <= angle <= 60) and self.ammo > self.trat):
-            # если соблюдены условия запускаем функцию высрела
+        if (self.dakka and self.cadr > self.cadrtoshoot // 2 and (
+             -50 <= angle <= 60)) or (
+            self.shooting and self.cadr > self.cadrtoshoot and (
+             -50 <= angle <= 60) and self.ammo > self.trat):
+            # если соблюдены условия запускаем функцию выстрела
             self.shootFunc(rx, ry, mouse_pos[0], mouse_pos[1], angle)
         elif self.cadr > self.cadrtoshoot:
-            self.cadr = self.cadrtoshoot  # cadr нужен для огранчения скоости стрельбы
+            # cadr нужен для огранчения скоости стрельбы
+            self.cadr = self.cadrtoshoot
             if self.ammo < self.maxammo and self.cadr >= self.cadrtoshoot:
                 self.ammo += self.plusammo  # иначе махинации траты патронов
         else:
@@ -157,7 +173,7 @@ class Player():  # Оснвной класс игрока, от которго �
             x, y = 1240, 40
             Hrect = self.healthImage.get_rect()
 
-            for _ in range(self.health):
+            for _ in range(self.health):  # и отрисовка сердечек
                 Hrect.center = x, y
                 screen.blit(self.healthImage, Hrect)
                 x -= 40
@@ -174,11 +190,13 @@ class Nobz(Player):
 class Flash(Player):
 
     def __init__(self, patron):
-        super().__init__(patron, "Flash", 170, 170, 130, 100, 60, 60, legsmove=70)
+        super().__init__(patron, "Flash", 170, 170,
+                         130, 100, 60, 60, legsmove=70)
         self.plusammo = 0.2
         self.trat = 2
         self.health = 6
 
+    # вынужденная перегрузка функции, из-за двойной стрельбы пулемета
     def shootFunc(self, rx, ry, mouse_pos0, mouse_pos1, angle):
         all_sprites.add(
             self.patron(
@@ -203,7 +221,8 @@ class Flash(Player):
 class Tank(Player):
 
     def __init__(self, patron):
-        super().__init__(patron, "Tank", 150, 150, 100, 120, 30, 30, legsmove=30)
+        super().__init__(patron, "Tank", 150, 150,
+                         100, 120, 30, 30, legsmove=30)
         self.ammo = 5
         self.maxammo = 5
         self.plusammo = 0.05
@@ -215,7 +234,8 @@ class Tank(Player):
 class Meh(Player):
 
     def __init__(self, patron):
-        super().__init__(patron, "Meh", 180, 150, 100, 120, 30, 30, legsmove=50)
+        super().__init__(patron, "Meh", 180, 150,
+                         100, 120, 30, 30, legsmove=50)
         self.ammo = 12
         self.maxammo = 12
         self.plusammo = 0.05
@@ -224,18 +244,18 @@ class Meh(Player):
         self.soundShoot1 = pg.mixer.Sound('Sounds/blast.mp3')
 
 
-class Snarad(
-        pygame.sprite.Sprite):  # основной класс снаряда, от котрого наследуюся остальные
+# основной класс снаряда, от котрого наследуюся остальные
+class Snarad(pygame.sprite.Sprite):
 
     def __init__(self, x, y, x2, y2, angle, sound, dlin, shir, im="bolt.png"):
         super().__init__(all_sprites)
         self.im = im
         image = load_image(self.im, dlin, shir)
-        self.x = x
+        self.x = x  # начальные координаты(это и следующая)
         self.y = y
-        self.x2 = x2
+        self.x2 = x2  # конечные координаты(эта и следущая)
         self.y2 = y2
-        self.angle = angle
+        self.angle = angle  # угол поворота
         self.image = image
         self.image = pygame.transform.rotate(self.image, angle)
         self.rect = self.image.get_rect()
@@ -244,20 +264,26 @@ class Snarad(
         self.speed = 10
         sound.set_volume(0.2)
         sound.play()
+        # список кому наносит урон
         self.mobs = set(['<Spore Sprite(in 1 groups)>',
                          '<Ground1 Sprite(in 1 groups)>',
                          '<Floor Sprite(in 1 groups)>',
                          '<Ground2 Sprite(in 1 groups)>'])
 
     def update(self):
-        if pygame.sprite.collide_mask(self, bunker) or pygame.sprite.collide_mask(
-                self, bunker2) or pygame.sprite.collide_mask(self, trub):
-            self.kill()  # уничтожение пр и столкновении
-        sp = set(map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
+        if pygame.sprite.collide_mask(self, bunker) or (
+           pygame.sprite.collide_mask(self, bunker2)) or (
+           pygame.sprite.collide_mask(self, trub)):
+            self.kill()  # уничтожение при и столкновении
+        # список с кем пересекается
+        sp = set(map(str, pygame.sprite.spritecollide(self,
+                                                      all_sprites, False)))
         if self.mobs & sp:
             self.kill()   # тут тоже
+        # это ограничение по дальности стрельбы, что-бы не нагружать систему
         if self.i > 70:
-            self.kill()  # это ограничение по дальности стрельбы, что-бы не нагружать систему
+            self.kill()
+        # движение по отрезку с заданой скоостью
         self.rect = self.rect.move(
             (self.x2 - self.x) // self.speed,
             (self.y2 - self.y) // self.speed)
@@ -267,14 +293,16 @@ class Snarad(
 class Bolt(Snarad):
 
     def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound):
-        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 30, 10, "bolt.png")
+        super().__init__(rx, ry, mouse_pos0,
+                         mouse_pos1, angle, sound, 30, 10, "bolt.png")
         self.speed = 10
 
 
 class Zap(Snarad):
 
     def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound, ):
-        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 40, 10, "zap.png")
+        super().__init__(rx, ry, mouse_pos0,
+                         mouse_pos1, angle, sound, 40, 10, "zap.png")
         self.speed = 5
         self.mobs = set()
 
@@ -282,35 +310,40 @@ class Zap(Snarad):
 class Blast(Snarad):
 
     def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound, ):
-        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 25, 20, "blast.png")
+        super().__init__(rx, ry, mouse_pos0,
+                         mouse_pos1, angle, sound, 25, 20, "blast.png")
         self.speed = 30
 
 
 class MiniBolt(Snarad):
 
     def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound):
-        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 20, 7, "bolt.png")
+        super().__init__(rx, ry, mouse_pos0,
+                         mouse_pos1, angle, sound, 20, 7, "bolt.png")
         self.speed = 8
 
 
-class Bio(Snarad):
+class Bio(Snarad):  # вражеский снаряд который в нас летит
 
     def __init__(self, rx, ry, mouse_pos0, mouse_pos1, angle, sound):
-        super().__init__(rx, ry, mouse_pos0, mouse_pos1, angle, sound, 20, 20, "bio.png")
+        super().__init__(rx, ry, mouse_pos0,
+                         mouse_pos1, angle, sound, 20, 20, "bio.png")
         self.speed = 40
         self.mobs = set(['<Bunker Sprite(in 1 groups)>',
                         '<Bunker2 Sprite(in 1 groups)>'])
 
-    def update(self):  # вынужденая перегрузна функции так-как снарядом стреляет враг в персонажа
+    # вынужденая перегрузна функции так-как снарядом стреляет враг в персонажа
+    def update(self):
         if pygame.sprite.collide_mask(
                 self, bunker) or pygame.sprite.collide_mask(self, bunker2):
             self.kill()
-        sp = set(map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
+        sp = set(map(str, pygame.sprite.spritecollide(self,
+                                                      all_sprites, False)))
         if self.mobs & sp:
-            bunker.Health -= 1
+            bunker.Health -= 1  # нанесание урона бункеру
             self.kill()
         if self.i > 70:
-            self.kill()
+            self.kill()  # самоуничтожение по прошествию времени
         self.rect = self.rect.move(
             (self.x2 - self.x) // self.speed,
             (self.y2 - self.y) // self.speed)
@@ -392,9 +425,9 @@ class Enemy(pygame.sprite.Sprite):  # родительский класс наз
         self.y = y
         self.rect = self.image.get_rect()
         self.rect.center = 1200, 700
-        self.move = -3
-        self.damage = 5
-        self.health = 1
+        self.move = -3  # скорость движения
+        self.damage = 5  # урон зданию
+        self.health = 1  # здоровье
         self.dead = False
         self.t = False
         self.sounddead = pg.mixer.Sound('Sounds/Dead.mp3')
@@ -404,17 +437,19 @@ class Enemy(pygame.sprite.Sprite):  # родительский класс наз
     def update(self):
         global score
         if self.dead:
-            if self.dead != True:  # запуск анимации смерти
+            if self.dead is not True:  # запуск анимации смерти
                 self.image = load_image(
                     f"Tyranids/Dead/{self.dead // 3}.png", self.x, self.y)
                 if self.dead < 21:
-                    self.dead += 1
+                    self.dead += 1  # покадровое смещение
                 else:
                     self.kill()
         else:
             self.rect = self.rect.move(self.move, 0)
+            # список для получения урона от снарядов
             sp = tuple(
-                map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
+                map(str, pygame.sprite.spritecollide(self,
+                                                     all_sprites, False)))
             if '<Bolt Sprite(in 1 groups)>' in sp:
                 self.health -= 1
             elif '<MiniBolt Sprite(in 1 groups)>' in sp:
@@ -472,13 +507,13 @@ class FlyEnemy(Enemy):  # класс летющего монстра
         self.rect.center = 1300, random.randint(200, 300)
         self.toammo = 0
         self.health = 2
-        self.sound = pg.mixer.Sound(f'Sounds/bio.mp3')
+        self.sound = pg.mixer.Sound(f'Sounds/bio.mp3')  # звук выстрела
         self.sound.set_volume(0.3)
         self.ponts = 4
 
     def update(self):
         if self.dead:  # анмация смерти
-            if self.dead != True:
+            if self.dead is not True:
                 self.image = load_image(
                     f"Tyranids/Dead/{self.dead // 3}.png", self.x, self.y)
                 self.rect = self.rect.move(0, 2)
@@ -488,9 +523,10 @@ class FlyEnemy(Enemy):  # класс летющего монстра
                     self.kill()
         else:
             self.rect = self.rect.move(self.move, 0)
-            # нниже получение урона от пересечения с обьектами
+            # аналогичный наземным список столкновений
             sp = tuple(
-                map(str, pygame.sprite.spritecollide(self, all_sprites, False)))
+                map(str, pygame.sprite.spritecollide(self,
+                                                     all_sprites, False)))
             if '<Bolt Sprite(in 1 groups)>' in sp:
                 self.health -= 1
             elif '<MiniBolt Sprite(in 1 groups)>' in sp:
@@ -506,18 +542,16 @@ class FlyEnemy(Enemy):  # класс летющего монстра
                     self.sounddead.play()
                     self.dead = 3
 
-            if self.rect.x < 370:
+            if self.rect.x < 370:  # остановка при подлете к башне
                 self.move = 0
 
             if self.toammo >= 80:
                 self.toammo = 0
-                angle = math.degrees(math.atan2(self.rect.x - Gamer.rect.x,
-                                                self.rect.y - Gamer.rect.y))
                 all_sprites.add(Bio(self.rect.x + 50,
                                     self.rect.y + 80,
                                     Gamer.rect2.x,
                                     Gamer.rect2.y,
-                                    angle,
+                                    0,  # нет вращения из-за круглоко снаряда
                                     self.sound))
             else:
                 self.toammo += 1
@@ -535,7 +569,7 @@ if __name__ == '__main__':
 
     image = pygame.image.load("Sprites/fon2.png")
     clock = pygame.time.Clock()
-    size = width, height = 1280, 720
+    size = width, height = 1280, 720  # размер окна
     image = pygame.transform.scale(image, size)
     screen = pygame.display.set_mode(size, pg.SCALED)
     pygame.display.set_caption("WAAAAAAAAGHHHH!!!")
@@ -569,7 +603,7 @@ if __name__ == '__main__':
     all_sprites.add(floor, bunker, bunker2, trub)
     fly = pg.mixer.Sound('Sounds/fly.mp3')
     NoDakka = pygame.USEREVENT + 0
-    CanDakka = True
+    CanDakka = True  # условие возможности ускоренной стрельбы
     pygame.font.init()
     time = 1
     running = True
@@ -596,6 +630,7 @@ if __name__ == '__main__':
                     os.startfile('menu')
                     sys.exit()
                 elif event.key == pygame.K_F1:
+                    # количество нужных очков если компания
                     if game_reg == 'Campaign':
                         if num_company == 0:
                             score = 500
@@ -604,7 +639,7 @@ if __name__ == '__main__':
                         elif num_company == 2:
                             score = 1500
 
-            if event.type == NoDakka:
+            if event.type == NoDakka:  # событие становки ускоренной стрельбы
                 Gamer.dakka = False
                 Gamer.trat = 1
 
@@ -622,6 +657,7 @@ if __name__ == '__main__':
             num_company = int(missia.readlines()[0])
             missia.close()
             if num_company == 0:
+                # ниже условия по окончанию уровня для компании
                 if score >= 200:
                     missia = open('Text/mission_number.txt', 'w')
                     pygame.time.delay(1500)
@@ -684,3 +720,4 @@ if __name__ == '__main__':
             sys.exit()
         clock.tick(50)
     pygame.quit()
+
