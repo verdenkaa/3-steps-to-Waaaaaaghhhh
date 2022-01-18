@@ -189,6 +189,7 @@ if __name__ == '__main__':
         pg.display.flip()
         for i in pg.event.get():
             if i.type == pg.QUIT:
+                os.startfile('menu')
                 sys.exit()
         clock.tick(60)
         finish += 1
